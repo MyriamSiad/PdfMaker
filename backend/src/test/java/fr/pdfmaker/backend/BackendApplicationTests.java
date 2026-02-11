@@ -1,10 +1,10 @@
-package fr.doranco.pdfmaker;
+package fr.pdfmaker.backend;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class PdfmakerApplicationTests {
+class BackendApplicationTests {
 
 	@Test
 	void contextLoads() {

@@ -8,10 +8,10 @@
 		<version>3.5.10</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>fr.doranco</groupId>
-	<artifactId>pdfmaker</artifactId>
+	<groupId>fr.pdfmaker</groupId>
+	<artifactId>backend</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>pdfmaker</name>
+	<name>PDF Maker - Backend</name>
 	<description>projet soutenance</description>
 	<url/>
 	<licenses>
@@ -63,6 +63,14 @@
 			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+
+		<dependency>
+			<groupId>com.itextpdf</groupId>
+			<artifactId>itext7-core</artifactId>
+			<version>8.0.3</version>
+			<type>pom</type>
+		</dependency>
+
 	</dependencies>
 
 	<build>
