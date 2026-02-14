@@ -42,6 +42,10 @@ public class FichierPdf {
     private Boolean favoris;
 
 
+    @ManyToOne
+    @JoinColumn(name = "id_user" , nullable = false)
+    private Utilisateur  utilisateur;
+
 
 
 

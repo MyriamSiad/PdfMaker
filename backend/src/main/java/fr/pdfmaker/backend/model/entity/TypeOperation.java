@@ -1,6 +1,9 @@
 package fr.pdfmaker.backend.model.entity;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 /*id_type_operation
 libelle_operation
 couleur
@@ -33,5 +36,7 @@ public class TypeOperation {
 
     @Column (nullable = false , length = 120)
     private String description;
+
+
 
 }

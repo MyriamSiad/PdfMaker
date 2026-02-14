@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table (name = "utilisateur")
@@ -31,8 +33,13 @@ public class Utilisateur {
     @Column (nullable = true , length = 64)
     private LocalDate dateCreationCompte;
 
-    //@OneToMany( fetch = FetchType.LAZY)
 
 
+    @OneToMany(mappedBy = "utilisateur")
+    private List<FichierPdf> listFichiersPdf = new ArrayList<>();
+
+
+    @OneToMany(mappedBy = "utilisateur")
+    private List<Operation> operations = new ArrayList<>();
 
 }
