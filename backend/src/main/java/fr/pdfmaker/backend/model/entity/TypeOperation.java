@@ -19,24 +19,27 @@ description
 @EqualsAndHashCode
 @Entity
 @Table (name = "type_operation")
-public class TypeOperation {
 
-    @Id
-    @GeneratedValue (strategy = GenerationType.IDENTITY)
-    private Long idTypeOperation;
+    public class TypeOperation {
 
-    @Column (nullable = false , length = 50)
-    private String libelleOperation;
+        @Id
+        @GeneratedValue (strategy = GenerationType.IDENTITY)
+        private Long idTypeOperation;
 
-    @Column (nullable = false , length = 50)
-    private String couleur;
+        @Column (nullable = false , length = 50)
+        private String libelleOperation;
 
-    @Column (nullable = false , length = 50)
-    private String icone;
+        @Column (nullable = false , length = 50)
+        private String couleur;
 
-    @Column (nullable = false , length = 120)
-    private String description;
+        @Column (nullable = false , length = 50)
+        private String icone;
 
+        @Column (nullable = false , length = 120)
+        private String description;
 
+        @OneToMany(mappedBy = "typeOperation")
+        private List<Operation> operationList;
 
-}
+    }
+

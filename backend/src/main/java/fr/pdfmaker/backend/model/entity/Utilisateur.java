@@ -5,7 +5,9 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table (name = "utilisateur")
@@ -41,5 +43,10 @@ public class Utilisateur {
 
     @OneToMany(mappedBy = "utilisateur")
     private List<Operation> operations = new ArrayList<>();
+
+
+    @OneToMany(mappedBy = "utilisateur")
+    private Set<Tag> tags = new HashSet<>();
+
 
 }

@@ -14,8 +14,9 @@ import java.time.LocalDateTime;
 public class Operation {
 
     @Id
+    @GeneratedValue (strategy = GenerationType.UUID)
     @Column(name = "id_operation")
-    private String id;
+    private String idOperation;
 
     @Column(name = "fichier_source", length = 61)
     private String fichierSource;
