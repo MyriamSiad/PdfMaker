@@ -17,6 +17,8 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
+
+
 public class Utilisateur {
 
     @Id
@@ -29,7 +31,10 @@ public class Utilisateur {
     @Column (nullable = false , length = 48)
     private String prenom;
 
-    @Column (nullable = false , length = 64)
+    @Column (nullable = false , length = 48)
+    private String email;
+
+    @Column (nullable = false , length = 250)
     private String passwordHash;
 
     @Column (nullable = true , length = 64)
