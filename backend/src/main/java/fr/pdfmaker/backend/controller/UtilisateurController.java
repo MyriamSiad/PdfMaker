@@ -1,6 +1,8 @@
 package fr.pdfmaker.backend.controller;
 
+import fr.pdfmaker.backend.model.dto.LoginDto;
 import fr.pdfmaker.backend.model.dto.UtilisateurCreationDto;
+import fr.pdfmaker.backend.model.dto.UtilisateurDto;
 import fr.pdfmaker.backend.model.entity.Utilisateur;
 import fr.pdfmaker.backend.service.IUtilisateurService;
 import jakarta.ws.rs.Produces;
@@ -32,7 +34,7 @@ public class UtilisateurController implements IUtilisateurController {
     public ResponseEntity<Long> createUtilisateur( @RequestBody UtilisateurCreationDto user) {
 
         try{
-           Long id =  userService.addOrUpdateUser(user);
+           Long id =  userService.createUser(user);
             return new ResponseEntity<>(id, HttpStatus.CREATED);
         }catch (Exception e ){
             e.printStackTrace();
@@ -43,7 +45,35 @@ public class UtilisateurController implements IUtilisateurController {
     }
 
     @Override
-    public ResponseEntity<UtilisateurCreationDto> connexionUtilisateur(Utilisateur user) {
-        return null;
+    @PostMapping("/update")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public ResponseEntity<Long> updateUtilisateur( @RequestBody UtilisateurDto user) {
+
+        try{
+            Long id =  userService.updateUser(user);
+            return new ResponseEntity<>(id, HttpStatus.CREATED);
+        }catch (Exception e ){
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+
+    }
+
+    @Override
+    @PostMapping("/login")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public ResponseEntity<UtilisateurDto> connexionUtilisateur( @RequestBody LoginDto user) {
+
+        try{
+            UtilisateurDto userDto =  userService.loginUser(user);
+            return new ResponseEntity(userDto, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
     }
 }

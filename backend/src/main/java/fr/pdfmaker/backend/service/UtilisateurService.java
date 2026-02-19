@@ -44,36 +44,76 @@ public class UtilisateurService implements IUtilisateurService {
      * @return elle retourne true si il existe déjà un utilisateur avec cette email dans la bdd , false le cas inverse.
      * @author Myriam S.
      */
-    private Boolean verifyExistingUserEmail (String email) {
-        boolean flag = true;
+    private void verifyExistingUserEmail (String email , Long idUserToExclude) {
+
+        if(email.isBlank()){
+             throw new IllegalArgumentException("Email vide !! ");
+         }
+         Utilisateur user = utilisateurRepository.getUtilisateurByEmail(email.trim());
+         if(user != null && !user.getIdUser().equals(idUserToExclude)){
+             throw new IllegalArgumentException("Adresse mail déjà dans la BDD ! ");
+         }
+    }
+
+    /**
+     *
+     * @param email C'est l'email qu'on veut vérifier.
+     * @return elle retourne true si il existe déjà un utilisateur avec cette email dans la bdd , false le cas inverse.
+     * @author Myriam S.
+     */
+    private void verifyExistingUserEmail (String email ) {
         if(email.isBlank()){
             throw new IllegalArgumentException("Email vide !! ");
 
         }
-        if(utilisateurRepository.getUtilisateurByEmail(email.trim()) != null){
-            flag = false;
+        Utilisateur user = utilisateurRepository.getUtilisateurByEmail(email.trim());
+        if(user != null){
+            throw new IllegalArgumentException("Adresse mail déjà dans la BDD ! ");
         }
-        return flag;
+    }
+
+
+    /**
+     * Methode qui permet de hasher le mot de passe de l'utilisateur avant de le stocker dans la bdd
+     * @param password
+     * @return le mot de passe hashé
+     * @author Myriam S.
+     */
+
+    private String hashPassword(String password){
+        Argon2PasswordEncoder encoder = Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8();
+        return encoder.encode(password);
+    }
+
+    /**
+     * Methode qui permet de vérifier si le mot de passe donné par l'utilisateur lors de sa connexion correspond bien au mot de passe hashé stocké dans la bdd
+     * @param rawPassword c'est le mot de passe donné par l'utilisateur lors de sa connexion
+     * @param encodedPassword c'est le mot de passe hashé stocké dans la bdd
+     * @return true si les deux mots de passe correspondent, false le cas inverse
+     * @author Myriam S.
+     */
+    private boolean verifyPassword(String rawPassword, String encodedPassword){
+        Argon2PasswordEncoder encoder = Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8();
+        return encoder.matches(rawPassword, encodedPassword);
+    }
+
+
+    @Override
+    @Transactional
+    public Long createUser(UtilisateurCreationDto user) throws Exception {
+            boolean emailExists;
+            verifyExistingUserEmail(user.getEmail());
+            verifyUserInfo(user);
+            String passwordHash = hashPassword(user.getPasswordHash());
+            user.setPasswordHash(passwordHash);
+            Utilisateur _user = concertUserDtoToUser(user);
+            return utilisateurRepository.save(_user).getIdUser();
     }
 
     @Override
     @Transactional
-    public Long addOrUpdateUser(UtilisateurCreationDto user) throws Exception {
-        if(user.getIdUser() == null ){ //Create
-           boolean emailExists;
-           emailExists = verifyExistingUserEmail(user.getEmail());
-           if(!emailExists){
-               throw new IllegalArgumentException( "Adresse mail déjà dans la BDD ! ");
-           }
+    public Long updateUser (UtilisateurDto user) throws Exception {
 
-            verifyUserInfo(user);
-            Argon2PasswordEncoder encoder = Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8();
-            String passwordHash = encoder.encode(user.getPasswordHash());
-            user.setPasswordHash(passwordHash);
-            Utilisateur _user = concertUserDtoToUser(user);
-            return utilisateurRepository.save(_user).getIdUser();
-        }
-        else{ //Update
             if( !utilisateurRepository.existsById(user.getIdUser())){
                 throw new IllegalArgumentException("Cette utilisateur n'existe pas !  ");
             }
@@ -83,16 +123,26 @@ public class UtilisateurService implements IUtilisateurService {
             }
             userToUpdate.setNom(user.getNom());
             userToUpdate.setPrenom(user.getPrenom());
+            verifyExistingUserEmail(user.getEmail(), user.getIdUser());
             userToUpdate.setEmail(user.getEmail());
-            userToUpdate.setPasswordHash(user.getPasswordHash());
-
-            utilisateurRepository.save(userToUpdate);
+            //userToUpdate.setPasswordHash(hashPassword(user.getPasswordHash()));
+           //utilisateurRepository.save(userToUpdate);
             return user.getIdUser();
         }
-    }
+
 
     @Override
     public UtilisateurDto loginUser(LoginDto login) throws Exception {
+            if(login == null || login.getEmail() == null || login.getPasswordHash() == null){
+                throw new IllegalArgumentException("Les données de connexion sont invalides ! ");
+            }
+            Utilisateur user = utilisateurRepository.getUtilisateurByEmail(login.getEmail().trim());
+            if(user == null){
+                throw new IllegalArgumentException("Aucun utilisateur trouvé avec cette adresse email ! ");
+            }
+            if(!verifyPassword(login.getPasswordHash(), user.getPasswordHash())){
+                throw new IllegalArgumentException("Mot de passe incorrect ! ");
+            }
         return null;
     }
 }
