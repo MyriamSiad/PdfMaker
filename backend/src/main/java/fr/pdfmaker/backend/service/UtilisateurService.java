@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import static fr.pdfmaker.backend.utils.DtoUserConverter.concertUserDtoToUser;
+import static fr.pdfmaker.backend.utils.DtoUserConverter.convertUserToUserDto;
 
 @Service
 public class UtilisateurService implements IUtilisateurService {
@@ -101,7 +102,7 @@ public class UtilisateurService implements IUtilisateurService {
     @Override
     @Transactional
     public Long createUser(UtilisateurCreationDto user) throws Exception {
-            boolean emailExists;
+
             verifyExistingUserEmail(user.getEmail());
             verifyUserInfo(user);
             String passwordHash = hashPassword(user.getPasswordHash());
@@ -115,7 +116,7 @@ public class UtilisateurService implements IUtilisateurService {
     public Long updateUser (UtilisateurDto user) throws Exception {
 
             if( !utilisateurRepository.existsById(user.getIdUser())){
-                throw new IllegalArgumentException("Cette utilisateur n'existe pas !  ");
+                throw new IllegalArgumentException("Cet utilisateur n'existe pas !  ");
             }
             Utilisateur userToUpdate = utilisateurRepository.findByIdUser(user.getIdUser());
             if(userToUpdate == null){
@@ -143,6 +144,6 @@ public class UtilisateurService implements IUtilisateurService {
             if(!verifyPassword(login.getPasswordHash(), user.getPasswordHash())){
                 throw new IllegalArgumentException("Mot de passe incorrect ! ");
             }
-        return null;
+        return convertUserToUserDto(user);
     }
 }

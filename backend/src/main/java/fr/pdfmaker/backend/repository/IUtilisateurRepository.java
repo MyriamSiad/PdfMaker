@@ -14,7 +14,6 @@ public interface IUtilisateurRepository extends JpaRepository<Utilisateur , Long
     Utilisateur findByIdUser (Long id) throws Exception ;
     Utilisateur getUtilisateurByEmail(String email);
 
-    //UtilisateurDto addUtilisateur(Utilisateur user);
 
 
 

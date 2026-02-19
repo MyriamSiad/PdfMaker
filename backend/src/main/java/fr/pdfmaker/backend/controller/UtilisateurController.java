@@ -45,14 +45,14 @@ public class UtilisateurController implements IUtilisateurController {
     }
 
     @Override
-    @PostMapping("/update")
+    @PutMapping("/update/{idUser}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public ResponseEntity<Long> updateUtilisateur( @RequestBody UtilisateurDto user) {
+    public ResponseEntity<Long> updateUtilisateur(@PathVariable Long idUser,  @RequestBody UtilisateurDto user) {
 
         try{
-            Long id =  userService.updateUser(user);
-            return new ResponseEntity<>(id, HttpStatus.CREATED);
+          userService.updateUser(user);
+            return new ResponseEntity<>(idUser, HttpStatus.ACCEPTED);
         }catch (Exception e ){
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

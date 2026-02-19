@@ -2,7 +2,9 @@ package fr.pdfmaker.backend.model.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -38,7 +40,8 @@ public class Utilisateur {
     private String passwordHash;
 
     @Column (nullable = true , length = 64)
-    private LocalDate dateCreationCompte;
+    @CreationTimestamp
+    private Instant dateCreationCompte;
 
 
 

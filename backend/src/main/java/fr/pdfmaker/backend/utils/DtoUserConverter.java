@@ -1,6 +1,7 @@
 package fr.pdfmaker.backend.utils;
 
 import fr.pdfmaker.backend.model.dto.UtilisateurCreationDto;
+import fr.pdfmaker.backend.model.dto.UtilisateurDto;
 import fr.pdfmaker.backend.model.entity.Utilisateur;
 
 public final  class DtoUserConverter {
@@ -17,8 +18,22 @@ public final  class DtoUserConverter {
         user.setPasswordHash(userDto.getPasswordHash());
         user.setNom(userDto.getNom());
         user.setEmail(userDto.getEmail());
-        user.setDateCreationCompte(null);  //Faut récuperer le timestamp
-
         return user;
+    }
+
+    /**
+     * C'est une methode qui permet de convertir un Utilisateur, en simple UtilisateurDto ! Pour pouvoir l'utiliser dans les réponses de l'API
+     * @param user Le user qu'on veut convertir en dto.
+     * @return  un objet userDto.
+     */
+    public static UtilisateurDto convertUserToUserDto (Utilisateur user){
+        UtilisateurDto userDto = new UtilisateurDto();
+
+        userDto.setPrenom(user.getPrenom());
+        userDto.setNom(user.getNom());
+        userDto.setEmail(user.getEmail());
+        userDto.setIdUser(user.getIdUser());
+
+        return userDto;
     }
 }

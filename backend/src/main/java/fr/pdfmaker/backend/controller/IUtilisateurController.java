@@ -15,9 +15,25 @@ public interface IUtilisateurController {
 
     String getInfos();
 
+    /**
+     * Crée un utilisateur à partir d'un DTO de création d'utilisateur.
+     * @param user Le DTO contenant les informations de l'utilisateur à créer.
+     * @return L'ID de l'utilisateur créé.
+     */
     ResponseEntity<Long> createUtilisateur(UtilisateurCreationDto user );
-    ResponseEntity<Long> updateUtilisateur(UtilisateurDto user);
 
+    /**
+     * Met à jour les informations d'un utilisateur à partir d'un DTO d'utilisateur.
+     * @param user Le DTO contenant les informations de l'utilisateur à mettre à jour.
+     * @return L'ID de l'utilisateur mis à jour.
+     */
+    ResponseEntity<Long> updateUtilisateur(Long idIdUser, UtilisateurDto user);
+
+    /**
+     * Authentifie un utilisateur à partir d'un DTO de connexion.
+     * @param login Le DTO contenant les informations de connexion de l'utilisateur. (Login, password)
+     * @return Un DTO de l'utilisateur authentifié.
+     */
     ResponseEntity<UtilisateurDto> connexionUtilisateur(LoginDto login);
 
 }
