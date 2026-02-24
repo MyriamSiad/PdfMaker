@@ -1,4 +1,4 @@
-package fr.pdfmaker.backend.utils;
+package fr.pdfmaker.backend.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;

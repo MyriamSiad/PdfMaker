@@ -58,6 +58,7 @@ public class UtilisateurController implements IUtilisateurController {
         }
     }
 
+
     @Override
     @PostMapping("/login")
     @Consumes(MediaType.APPLICATION_JSON)
