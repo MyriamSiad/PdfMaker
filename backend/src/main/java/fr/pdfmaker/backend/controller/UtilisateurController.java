@@ -1,10 +1,10 @@
 package fr.pdfmaker.backend.controller;
 
+import fr.pdfmaker.backend.model.dto.InscriptionRequestDto;
 import fr.pdfmaker.backend.model.dto.LoginDto;
-import fr.pdfmaker.backend.model.dto.UtilisateurCreationDto;
 import fr.pdfmaker.backend.model.dto.UtilisateurDto;
-import fr.pdfmaker.backend.model.entity.Utilisateur;
 import fr.pdfmaker.backend.service.IUtilisateurService;
+import jakarta.validation.Valid;
 import jakarta.ws.rs.Produces;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -31,7 +31,7 @@ public class UtilisateurController implements IUtilisateurController {
     @PostMapping("/create")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public ResponseEntity<Long> createUtilisateur( @RequestBody UtilisateurCreationDto user) {
+    public ResponseEntity<Long> createUtilisateur( @Valid @RequestBody InscriptionRequestDto user) {
 
         try{
            Long id =  userService.createUser(user);

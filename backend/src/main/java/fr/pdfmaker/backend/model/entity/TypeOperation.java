@@ -29,12 +29,6 @@ description
         @Column (nullable = false , length = 50)
         private String libelleOperation;
 
-        @Column (nullable = false , length = 50)
-        private String couleur;
-
-        @Column (nullable = false , length = 50)
-        private String icone;
-
         @Column (nullable = false , length = 120)
         private String description;
 

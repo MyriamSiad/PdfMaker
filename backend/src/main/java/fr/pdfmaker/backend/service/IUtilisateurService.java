@@ -1,10 +1,8 @@
 package fr.pdfmaker.backend.service;
 
+import fr.pdfmaker.backend.model.dto.InscriptionRequestDto;
 import fr.pdfmaker.backend.model.dto.LoginDto;
-import fr.pdfmaker.backend.model.dto.UtilisateurCreationDto;
 import fr.pdfmaker.backend.model.dto.UtilisateurDto;
-import fr.pdfmaker.backend.model.entity.Utilisateur;
-import org.springframework.stereotype.Service;
 
 
 public interface IUtilisateurService {
@@ -17,7 +15,7 @@ public interface IUtilisateurService {
      * @return L'ID de l'utilisateur créé.
      * @throws Exception Si une erreur survient lors de la création de l'utilisateur.
      */
-    Long createUser(UtilisateurCreationDto user)  throws Exception;
+    Long createUser(InscriptionRequestDto user)  throws Exception;
 
     /**
      * Met à jour les informations d'un utilisateur à partir d'un DTO d'utilisateur.

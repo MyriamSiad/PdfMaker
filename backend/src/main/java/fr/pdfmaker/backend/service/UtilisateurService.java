@@ -1,14 +1,18 @@
 package fr.pdfmaker.backend.service;
 
+import fr.pdfmaker.backend.model.dto.InscriptionRequestDto;
 import fr.pdfmaker.backend.model.dto.LoginDto;
-import fr.pdfmaker.backend.model.dto.UtilisateurCreationDto;
 import fr.pdfmaker.backend.model.dto.UtilisateurDto;
 import fr.pdfmaker.backend.model.entity.Utilisateur;
 import fr.pdfmaker.backend.repository.IUtilisateurRepository;
+import fr.pdfmaker.backend.validation.validator.EmailValidator;
+import fr.pdfmaker.backend.validation.validator.PasswordValidator;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import static fr.pdfmaker.backend.utils.DtoUserConverter.concertUserDtoToUser;
 import static fr.pdfmaker.backend.utils.DtoUserConverter.convertUserToUserDto;
@@ -18,6 +22,7 @@ public class UtilisateurService implements IUtilisateurService {
 
     @Autowired
     private IUtilisateurRepository utilisateurRepository;
+
 
 
     @Override
@@ -31,7 +36,7 @@ public class UtilisateurService implements IUtilisateurService {
      * @param user c'est l'utilisateur (objet) qu'on veut vérifier,
      * @author Myriam S.
      */
-    private void verifyUserInfo(UtilisateurCreationDto user){
+    private void verifyUserInfo(InscriptionRequestDto user){
 
         if (user == null ||
          user.getNom() == null || user.getEmail()  == null ||user.getPrenom() == null || user.getPasswordHash() == null){
@@ -101,13 +106,20 @@ public class UtilisateurService implements IUtilisateurService {
 
     @Override
     @Transactional
-    public Long createUser(UtilisateurCreationDto user) throws Exception {
+    public Long createUser( InscriptionRequestDto user) throws Exception {
+
+      /*  PasswordValidator passwordValidator = new PasswordValidator();
+        EmailValidator emailValidator = new EmailValidator();
+        if(!passwordValidator.isValid(user.getPasswordHash(), null)){
+            throw new IllegalArgumentException("Le mot de passe ne respecte pas les critères de sécurité !");
+        }*/
 
             verifyExistingUserEmail(user.getEmail());
             verifyUserInfo(user);
             String passwordHash = hashPassword(user.getPasswordHash());
             user.setPasswordHash(passwordHash);
             Utilisateur _user = concertUserDtoToUser(user);
+
             return utilisateurRepository.save(_user).getIdUser();
     }
 

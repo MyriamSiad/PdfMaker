@@ -1,17 +1,17 @@
 package fr.pdfmaker.backend.utils;
 
-import fr.pdfmaker.backend.model.dto.UtilisateurCreationDto;
+import fr.pdfmaker.backend.model.dto.InscriptionRequestDto;
 import fr.pdfmaker.backend.model.dto.UtilisateurDto;
 import fr.pdfmaker.backend.model.entity.Utilisateur;
 
 public final  class DtoUserConverter {
 
     /**
-     * C'est une methode qui permet de convertir un UtilisateurCreationDto, en simple utilisateur ! Pour pouvoir l'utiliser dans la BDD
+     * C'est une methode qui permet de convertir un InscriptionRequestDto, en simple utilisateur ! Pour pouvoir l'utiliser dans la BDD
      * @param userDto Le dto qui se charge de créer un user.
      * @return  un objet user.
      */
-    public static  Utilisateur  concertUserDtoToUser(UtilisateurCreationDto userDto){
+    public static  Utilisateur  concertUserDtoToUser(InscriptionRequestDto userDto){
         Utilisateur user = new Utilisateur();
 
         user.setPrenom(userDto.getPrenom());
