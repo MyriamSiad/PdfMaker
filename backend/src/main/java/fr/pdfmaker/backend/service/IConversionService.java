@@ -1,6 +1,6 @@
 package fr.pdfmaker.backend.service;
 
-public interface ConversionService {
+public interface IConversionService {
 
     /*void convertJpegToPdf(String inputPathFichier, String outputPathFichier);
     void convertPngToPdf(String inputPathFichier , String outputPathFichier);
