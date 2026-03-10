@@ -13,6 +13,7 @@ public @interface ValidName {
 
     String message() default "Format invalide !";
 
+
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 

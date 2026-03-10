@@ -43,8 +43,6 @@ public class Utilisateur {
     @CreationTimestamp
     private Instant dateCreationCompte;
 
-
-
     @OneToMany(mappedBy = "utilisateur")
     private List<FichierPdf> listFichiersPdf = new ArrayList<>();
 

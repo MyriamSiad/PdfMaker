@@ -11,7 +11,7 @@ public final  class DtoUserConverter {
      * @param userDto Le dto qui se charge de créer un user.
      * @return  un objet user.
      */
-    public static  Utilisateur  concertUserDtoToUser(InscriptionRequestDto userDto){
+    public static  Utilisateur  convertUserDtoToUser(InscriptionRequestDto userDto){
         Utilisateur user = new Utilisateur();
 
         user.setPrenom(userDto.getPrenom());

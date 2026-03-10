@@ -58,3 +58,12 @@ public class FichierPdf {
 
 
 }
+
+
+/*public class SeparationDto {
+    private String cheminFichier;
+    private Map<Integer, Integer> ordrePages;
+    // clé   = position dans le PDF résultat (1, 2, 3...)
+    // valeur = numéro de page dans le PDF original (6, 2, 8...)
+    private Long userId;
+}*/

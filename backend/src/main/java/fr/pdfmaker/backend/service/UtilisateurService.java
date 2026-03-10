@@ -14,8 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import static fr.pdfmaker.backend.utils.DtoUserConverter.concertUserDtoToUser;
-import static fr.pdfmaker.backend.utils.DtoUserConverter.convertUserToUserDto;
+import static fr.pdfmaker.backend.utils.DtoUserConverter.*;
 
 @Service
 public class UtilisateurService implements IUtilisateurService {
@@ -118,7 +117,7 @@ public class UtilisateurService implements IUtilisateurService {
             verifyUserInfo(user);
             String passwordHash = hashPassword(user.getPasswordHash());
             user.setPasswordHash(passwordHash);
-            Utilisateur _user = concertUserDtoToUser(user);
+            Utilisateur _user = convertUserDtoToUser(user);
 
             return utilisateurRepository.save(_user).getIdUser();
     }
