@@ -1,12 +1,14 @@
 package fr.pdfmaker.backend.service;
 
+import fr.pdfmaker.backend.model.dto.ConversionResultatDto;
+
 public interface IConversionService {
 
     /*void convertJpegToPdf(String inputPathFichier, String outputPathFichier);
     void convertPngToPdf(String inputPathFichier , String outputPathFichier);
     void convertTxtToPdf(String inputPathFichier , String outputPathFichier);
     */
-        void convertToPdf(String inputPathFichier, String outputPathFichier);
+        ConversionResultatDto convertToPdf(String inputPathFichier, String outputPathFichier);
 
         //Toutes mes classes vont implémenter cette méthode convertToPdf.
 
