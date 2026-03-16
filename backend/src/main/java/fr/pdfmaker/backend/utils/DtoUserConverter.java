@@ -1,7 +1,7 @@
 package fr.pdfmaker.backend.utils;
 
-import fr.pdfmaker.backend.model.dto.InscriptionRequestDto;
-import fr.pdfmaker.backend.model.dto.UtilisateurDto;
+import fr.pdfmaker.backend.model.dto.utilisateur.InscriptionRequestDto;
+import fr.pdfmaker.backend.model.dto.utilisateur.UtilisateurDto;
 import fr.pdfmaker.backend.model.entity.Utilisateur;
 
 public final  class DtoUserConverter {
