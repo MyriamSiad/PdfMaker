@@ -1,0 +1,38 @@
+
+<div class="login-container">
+  <h2>Connexion</h2>
+
+  @if (erreur) {
+    <div class="erreur">
+      {{ erreur }}
+    </div>
+  }
+
+  <form (ngSubmit)="onSubmit()">
+
+    <div>
+      <label>Email</label>
+      <input
+        type="email"
+        [(ngModel)]="loginRequest.email"
+        name="email"
+        required
+      />
+    </div>
+
+    <div>
+      <label>Mot de passe</label>
+      <input
+        type="password"
+        [(ngModel)]="loginRequest.motDePasse"
+        name="motDePasse"
+        required
+      />
+    </div>
+
+    <button type="submit" [disabled]="chargement">
+      {{ chargement ? 'Connexion...' : 'Se connecter' }}
+    </button>
+
+  </form>
+</div>

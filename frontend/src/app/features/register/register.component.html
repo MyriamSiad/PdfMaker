@@ -1,0 +1,74 @@
+<div class="register-container">
+  <h2>Créer un compte</h2>
+
+  @if (erreur) {
+    <div class="erreur">{{ erreur }}</div>
+  }
+
+  <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+
+    <!-- Nom -->
+    <div>
+      <label>Nom</label>
+      <input type="text" formControlName="nom" />
+      @if (nom?.invalid && nom?.touched) {
+        @if (nom?.errors?.['required']) {
+          <span class="erreur-champ">Le nom est obligatoire</span>
+        }
+        @if (nom?.errors?.['minlength']) {
+          <span class="erreur-champ">Minimum 2 caractères</span>
+        }
+      }
+    </div>
+
+    <!-- Prénom -->
+    <div>
+      <label>Prénom</label>
+      <input type="text" formControlName="prenom" />
+      @if (prenom?.invalid && prenom?.touched) {
+        @if (prenom?.errors?.['required']) {
+          <span class="erreur-champ">Le prénom est obligatoire</span>
+        }
+      }
+    </div>
+
+    <!-- Email -->
+    <div>
+      <label>Email</label>
+      <input type="email" formControlName="email" />
+      @if (email?.invalid && email?.touched) {
+        @if (email?.errors?.['required']) {
+          <span class="erreur-champ">L'email est obligatoire</span>
+        }
+        @if (email?.errors?.['email']) {
+          <span class="erreur-champ">Format email invalide</span>
+        }
+      }
+    </div>
+
+    <!-- Mot de passe -->
+    <div>
+      <label>Mot de passe</label>
+      <input type="password" formControlName="passwordHash" />
+      @if (passwordHash?.invalid && passwordHash?.touched) {
+        @if (passwordHash?.errors?.['required']) {
+          <span class="erreur-champ">Le mot de passe est obligatoire</span>
+        }
+        @if (passwordHash?.errors?.['minlength']) {
+          <span class="erreur-champ">Minimum 8 caractères</span>
+        }
+        @if (passwordHash?.errors?.['pattern']) {
+          <span class="erreur-champ">
+            Le mot de passe doit contenir au moins (12 caractères) : 1 minuscule, 1 majuscule, 1 chiffre, 1 caractère spécial (!&#64;#$%^&*)
+
+          </span>
+        }
+      }
+    </div>
+
+    <button type="submit" [disabled]="chargement">
+      {{ chargement ? 'Création...' : 'Créer mon compte' }}
+    </button>
+
+  </form>
+</div>

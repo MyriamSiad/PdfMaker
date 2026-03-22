@@ -36,6 +36,11 @@ public class JpegToPdfService implements IConversionService<ImageConversionReque
 
 
     @Override
+    public ConversionResultatDto convertToPdf(String inputPathFichier) {
+        return null;
+    }
+
+    @Override
     public ConversionResultatDto convert(ImageConversionRequestDto request) {
 
         Path cheminFichier = request.getCheminFichier();

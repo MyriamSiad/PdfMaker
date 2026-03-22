@@ -18,7 +18,7 @@ public class NameValidator implements ConstraintValidator<ValidName , String > {
         if (value == null || value.isBlank())
             return false;
 
-        if (value.length() < 2 || value.length() > 80)
+        if (value.length() < 2 || value.length() > 50)
             return false;
 
         // doit contenir au moins une lettre

@@ -36,6 +36,11 @@ public class TxtToPdfService  implements IConversionService <TxtConverstionReque
     );
 
     @Override
+    public ConversionResultatDto convertToPdf(String inputPathFichier) {
+        return null;
+    }
+
+    @Override
     public ConversionResultatDto convert(TxtConverstionRequestDto request) {
         Path cheminFichier = request.getCheminFichier();
 

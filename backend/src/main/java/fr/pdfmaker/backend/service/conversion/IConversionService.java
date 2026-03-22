@@ -8,6 +8,8 @@ import fr.pdfmaker.backend.model.dto.conversion.ConversionResultatDto;
 
 public interface IConversionService <T extends ConversionRequestDto> {
 
+    ConversionResultatDto convertToPdf(String inputPathFichier);
+
     /**
      * Convertit le fichier source décrit dans la requête en PDF.
      * Retourne un ConversionResultatDto portant le byte[] du PDF produit.

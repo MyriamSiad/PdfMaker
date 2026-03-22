@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -63,5 +64,12 @@ public class GlobalHandlerException {
         corps.put("message", message);
 
         return ResponseEntity.status(status).body(corps);
+    }
+
+    @ExceptionHandler(EmailDejaUtiliserException.class)
+    public ResponseEntity<Map<String, String>> gererEmailDejaUtilise(EmailDejaUtiliserException e) {
+        Map<String, String> erreur = new HashMap<>();
+        erreur.put("message", e.getMessage());
+        return ResponseEntity.status(409).body(erreur); // 409 = Conflict
     }
 }

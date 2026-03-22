@@ -15,7 +15,8 @@ import jakarta.ws.rs.Consumes;
 
 
 @RestController
-@CrossOrigin(origins = "http://localhost:8080")
+//@CrossOrigin(origins = "http://localhost:8080")
+@CrossOrigin(origins = "http://localhost:4200")
 @RequestMapping("/api/rest/user")
 public class UtilisateurController implements IUtilisateurController {
 
@@ -28,7 +29,7 @@ public class UtilisateurController implements IUtilisateurController {
 
 
     @Override
-    @PostMapping("/create")
+    @PostMapping("/register")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public ResponseEntity<Long> createUtilisateur( @Valid @RequestBody InscriptionRequestDto user) {
@@ -38,7 +39,8 @@ public class UtilisateurController implements IUtilisateurController {
             return new ResponseEntity<>(id, HttpStatus.CREATED);
         }catch (Exception e ){
             e.printStackTrace();
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            assert HttpStatus.resolve(409) != null;
+            return new ResponseEntity<>(HttpStatus.resolve(409));
         }
 
 

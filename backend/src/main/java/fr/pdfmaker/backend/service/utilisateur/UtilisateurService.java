@@ -1,5 +1,6 @@
 package fr.pdfmaker.backend.service.utilisateur;
 
+import fr.pdfmaker.backend.exception.EmailDejaUtiliserException;
 import fr.pdfmaker.backend.model.dto.utilisateur.InscriptionRequestDto;
 import fr.pdfmaker.backend.model.dto.utilisateur.LoginDto;
 import fr.pdfmaker.backend.model.dto.utilisateur.UtilisateurDto;
@@ -69,7 +70,7 @@ public class UtilisateurService implements IUtilisateurService {
         }
         Utilisateur user = utilisateurRepository.getUtilisateurByEmail(email.trim());
         if(user != null){
-            throw new IllegalArgumentException("Adresse mail déjà dans la BDD ! ");
+            throw new EmailDejaUtiliserException("Cet email est déjà utilisé");
         }
     }
 
@@ -141,14 +142,14 @@ public class UtilisateurService implements IUtilisateurService {
 
     @Override
     public UtilisateurDto loginUser(LoginDto login) throws Exception {
-            if(login == null || login.getEmail() == null || login.getPasswordHash() == null){
+            if(login == null || login.getEmail() == null || login.getMotDePasse() == null){
                 throw new IllegalArgumentException("Les données de connexion sont invalides ! ");
             }
             Utilisateur user = utilisateurRepository.getUtilisateurByEmail(login.getEmail().trim());
             if(user == null){
                 throw new IllegalArgumentException("Aucun utilisateur trouvé avec cette adresse email ! ");
             }
-            if(!verifyPassword(login.getPasswordHash(), user.getPasswordHash())){
+            if(!verifyPassword(login.getMotDePasse(), user.getPasswordHash())){
                 throw new IllegalArgumentException("Mot de passe incorrect ! ");
             }
         return convertUserToUserDto(user);
