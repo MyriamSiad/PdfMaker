@@ -3,12 +3,16 @@ import {Router, RouterLink} from '@angular/router';
 import { AuthService } from '@core/services/auth.service';
 import {  RegisterRequest} from '@core/models/auth/register/register-request.model';
 import {FormGroup, ReactiveFormsModule, FormBuilder, Validators} from '@angular/forms';
+import {MatIcon} from '@angular/material/icon';
+import {NgClass} from '@angular/common';
 
 @Component({
   selector: 'app-register',
   imports: [
     ReactiveFormsModule,
-    RouterLink
+    RouterLink,
+    MatIcon,
+    NgClass
   ],
   templateUrl: './register.component.html'
 })
@@ -89,7 +93,28 @@ export class RegisterComponent {
           default:
             this.erreur = err.error?.message || 'Une erreur est survenue';
         }
+
+
       }
+
+
     });
+
+
   }
+
+    getPasswordStrength(): number {
+      const val = this.passwordHash?.value || '';
+      let score = 0;
+      if (val.length >= 8) score++;
+      if (/[A-Z]/.test(val)) score++;
+      if (/[0-9]/.test(val)) score++;
+      if (/[^A-Za-z0-9]/.test(val)) score++;
+      return score;
+    }
+
+    getPasswordLabel(): string {
+      const labels = ['', 'Faible', 'Moyen', 'Bon', 'Fort'];
+      return labels[this.getPasswordStrength()];
+    }
 }
