@@ -1,4 +1,3 @@
-<app-navbar>
 
 <nav class="navbar">
   <div class="navbar-logo">
@@ -9,10 +8,12 @@
     <li><a routerLink="/login">login</a></li>
     <li><a routerLink="/register">register</a></li>
     <li><a routerLink="/txt-to-pdf">Txt to pdf </a></li>
-    <li><a routerLink="/contact">Blog</a></li>
+    <div class="navbar-actions">
+      <button (click)="logout()">Logout</button>
+    </div>
   </ul>
   <div class="navbar-actions">
     <!-- Add login/logout buttons or user-related actions here -->
   </div>
 </nav>
-  </app-navbar>
+

@@ -21,7 +21,9 @@ export class AuthService {
   private profilActif: ProfilResponse | null = null;
 
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient ) {
+    this.loadUserFromStorage();
+  }
 
   login(request: LoginRequest): Observable<ProfilResponse> {
     return this.http.post<ProfilResponse>(`${this.API_URL}/login`, request).pipe(
@@ -55,11 +57,8 @@ export class AuthService {
   }
 
   estConnecte(): boolean {
-    this.loadUserFromStorage();
-    if(this.currentUser !== null && this.currentUser !== undefined) {
-      return true;
-    }
-    return false;
+    return this.currentUser() !== null;
+
   }
 
   getProfil(): ProfilResponse | null {

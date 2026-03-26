@@ -4,7 +4,7 @@ import {AuthService} from '@services/auth.service';
 import {RouterLink} from '@angular/router';
 
 @Component({
-  selector: 'app-login',
+  selector: 'app-home',
   imports: [
     RouterLink
 
