@@ -72,7 +72,8 @@ public class UtilisateurController implements IUtilisateurController {
             return new ResponseEntity(userDto, HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(HttpStatus.resolve(401));
+
         }
 
     }

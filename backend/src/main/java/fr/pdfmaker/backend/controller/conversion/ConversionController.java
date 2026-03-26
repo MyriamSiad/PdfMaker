@@ -1,24 +1,30 @@
 package fr.pdfmaker.backend.controller.conversion;
 
 import fr.pdfmaker.backend.model.dto.conversion.ConversionResultatDto;
-import fr.pdfmaker.backend.model.dto.conversion.TxtConverstionRequestDto;
+import fr.pdfmaker.backend.model.dto.conversion.ImageConversionRequestDto;
+import fr.pdfmaker.backend.model.dto.conversion.TxtConversionRequestDto;
 import fr.pdfmaker.backend.service.conversion.IConversionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:4200")
-@RequestMapping("/api/rest/pdf/conversion/txt")
+@RequestMapping("/api/rest/pdf/conversion")
 public class ConversionController implements IConversionController {
+
 
 
     @Qualifier("txtToPdfService")
     @Autowired
-    private IConversionService conversionService;
+    private IConversionService<TxtConversionRequestDto> txtToPdfService;
+
+    @Qualifier("imageToPdfService")
+    @Autowired
+    private IConversionService<ImageConversionRequestDto> jpegToPdfService;
 
     @Override
     public ResponseEntity<byte[]> getFichier(String fullPath) {
@@ -27,12 +33,34 @@ public class ConversionController implements IConversionController {
 
 
     @Override
-    public ResponseEntity<ConversionResultatDto> convertirFichier(TxtConverstionRequestDto request) {
-        if (request == null  || request.getCheminFichier() == null || request.getNomFichierSortie() == null) {
+    @PostMapping(value = "/txt-to-pdf" , consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ConversionResultatDto> convertirTxt (TxtConversionRequestDto fichier){
+
+        if (fichier == null || fichier.getFichier().isEmpty() || fichier.getNomFichierSortie() == null || fichier.getNomFichierSortie().isBlank()) {
             return ResponseEntity.badRequest().build();
         }
-        ConversionResultatDto resultat = conversionService.convert(request);
-         return ResponseEntity.ok(resultat);
 
+        TxtConversionRequestDto request = new TxtConversionRequestDto();
+        request.setFichier(fichier.getFichier());
+        request.setNomFichierSortie(fichier.getNomFichierSortie());
+
+        ConversionResultatDto resultat = txtToPdfService.convert(request);
+        return ResponseEntity.ok(resultat);
     }
+
+    @Override
+    @PostMapping("/jpeg-to-pdf")
+    public ResponseEntity<ConversionResultatDto> convertirImage(@RequestBody ImageConversionRequestDto request) {
+
+        if (request == null
+                || request.getCheminFichier() == null
+                || request.getNomFichierSortie() == null) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        ConversionResultatDto resultat = jpegToPdfService.convert(request);
+        return ResponseEntity.ok(resultat);
+    }
+
+
 }

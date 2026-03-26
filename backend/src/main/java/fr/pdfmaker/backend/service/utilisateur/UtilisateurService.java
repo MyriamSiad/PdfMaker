@@ -1,6 +1,7 @@
 package fr.pdfmaker.backend.service.utilisateur;
 
 import fr.pdfmaker.backend.exception.EmailDejaUtiliserException;
+import fr.pdfmaker.backend.exception.LoginIncorrectException;
 import fr.pdfmaker.backend.model.dto.utilisateur.InscriptionRequestDto;
 import fr.pdfmaker.backend.model.dto.utilisateur.LoginDto;
 import fr.pdfmaker.backend.model.dto.utilisateur.UtilisateurDto;
@@ -147,10 +148,10 @@ public class UtilisateurService implements IUtilisateurService {
             }
             Utilisateur user = utilisateurRepository.getUtilisateurByEmail(login.getEmail().trim());
             if(user == null){
-                throw new IllegalArgumentException("Aucun utilisateur trouvé avec cette adresse email ! ");
+                throw new LoginIncorrectException("Login ou mot de passe incorrect. Veuillez réessayer.");
             }
             if(!verifyPassword(login.getMotDePasse(), user.getPasswordHash())){
-                throw new IllegalArgumentException("Mot de passe incorrect ! ");
+                throw new LoginIncorrectException("Mots de passe incorrect ! ");
             }
         return convertUserToUserDto(user);
     }

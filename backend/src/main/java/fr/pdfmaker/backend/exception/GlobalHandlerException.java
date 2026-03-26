@@ -72,4 +72,11 @@ public class GlobalHandlerException {
         erreur.put("message", e.getMessage());
         return ResponseEntity.status(409).body(erreur); // 409 = Conflict
     }
+
+    @ExceptionHandler (LoginIncorrectException.class)
+    public ResponseEntity<Map<String, String>> gererLoginIncorrect(LoginIncorrectException e) {
+        Map<String, String> erreur = new HashMap<>();
+        erreur.put("message", e.getMessage());
+        return ResponseEntity.status(401).body(erreur); // 401 = Unauthorized
+    }
 }

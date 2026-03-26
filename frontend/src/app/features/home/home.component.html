@@ -1,0 +1,12 @@
+<p>Page d'accueil </p>
+@if (user()) {
+  <p>Bonjour {{ user()!.nom }} !</p>
+  <p>Email : {{ user()!.email }}</p>
+  <p>prenom : {{ user()!.prenom }}</p>
+  <p></p>
+
+} @else {
+  <p>Vous n'êtes pas connecté.</p>
+  <a routerLink="/login"> Connectez-vous ! </a>
+
+}

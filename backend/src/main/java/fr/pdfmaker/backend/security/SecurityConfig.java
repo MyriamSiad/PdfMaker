@@ -30,7 +30,7 @@ public class SecurityConfig {
 
 
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/rest/user/login", "/api/rest/user/register").permitAll() // routes publiques
+                        .requestMatchers("/api/rest/user/login", "/api/rest/user/register",  "/api/rest/pdf/conversion/**").permitAll() // routes publiques
                         .anyRequest().authenticated()                        // tout le reste → authentifié
                 );
 

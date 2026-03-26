@@ -4,12 +4,12 @@ import fr.pdfmaker.backend.exception.ConversionException;
 import fr.pdfmaker.backend.exception.FichierIntrouvableException;
 import fr.pdfmaker.backend.exception.UnsupportedFormatException;
 import fr.pdfmaker.backend.model.dto.conversion.ConversionResultatDto;
-import fr.pdfmaker.backend.model.dto.conversion.TxtConverstionRequestDto;
+import fr.pdfmaker.backend.model.dto.conversion.TxtConversionRequestDto;
 import fr.pdfmaker.backend.model.pdf.TxtConversionModel;
-import fr.pdfmaker.backend.service.commun.SaveFileService;
 import org.openpdf.text.*;
 import org.openpdf.text.pdf.PdfWriter;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -22,7 +22,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @Service
-public class TxtToPdfService  implements IConversionService <TxtConverstionRequestDto> {
+public class TxtToPdfService  implements IConversionService <TxtConversionRequestDto> {
 
     private static final byte[] MAGIC_PDF  = { 0x25, 0x50, 0x44, 0x46 };          // %PDF
     private static final byte[] MAGIC_JPEG = { (byte) 0xFF, (byte) 0xD8, (byte) 0xFF }; // ÿØÿ
@@ -40,35 +40,44 @@ public class TxtToPdfService  implements IConversionService <TxtConverstionReque
         return null;
     }
 
+
     @Override
-    public ConversionResultatDto convert(TxtConverstionRequestDto request) {
-        Path cheminFichier = request.getCheminFichier();
+    public ConversionResultatDto convert(TxtConversionRequestDto request) {
+        MultipartFile fichier = request.getFichier();
 
-        if(!Files.exists(cheminFichier)){
-            throw new FichierIntrouvableException("Le fichier source est introuvable : " + cheminFichier);
-
+        // Vérification fichier non vide
+        if (fichier == null || fichier.isEmpty()) {
+            throw new FichierIntrouvableException("Aucun fichier reçu");
         }
 
         try {
-            byte[] magicBytes = lireMagicBytes(cheminFichier);
-            verifierFormat(magicBytes);
+
+            byte[] bytes = fichier.getBytes();
+
+
+            verifierFormat(Arrays.copyOf(bytes, Math.min(bytes.length, 8)));
 
             Charset charset = resoudreCharset(request.getCharset());
-            List<String> lignes = Files.readAllLines(cheminFichier, charset);
+            List<String> lignes = Arrays.asList(
+                    new String(bytes, charset).split("\\r?\\n")
+            );
 
             TxtConversionModel modele = new TxtConversionModel();
-
             byte[] contenuPdf = genererPdf(lignes, modele);
 
-            return new ConversionResultatDto(request.getNomFichierSortie() + ".pdf", contenuPdf);
-        }catch (UnsupportedFormatException | FichierIntrouvableException e) {
+            return new ConversionResultatDto(
+                    request.getNomFichierSortie() + ".pdf",
+                    contenuPdf
+            );
+
+        } catch (UnsupportedFormatException e) {
             throw e;
         } catch (IOException e) {
             throw new ConversionException(
-                    "Erreur lors de la lecture du fichier TXT : " + cheminFichier.getFileName(), e);
+                    "Erreur lors de la lecture du fichier TXT", e);
         } catch (Exception e) {
             throw new ConversionException(
-                    "Erreur lors de la conversion TXT → PDF : " + cheminFichier.getFileName(), e);
+                    "Erreur lors de la conversion TXT → PDF", e);
         }
 
     }

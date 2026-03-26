@@ -1,0 +1,66 @@
+<div class="conversion-container">
+  <h2>Conversion TXT → PDF</h2>
+
+  @if (erreur) {
+    <div class="erreur">{{ erreur }}</div>
+  }
+  @if (success) {
+    <div class="succes">✅ PDF généré avec succès !</div>
+  }
+
+  <!-- Zone Drag & Drop -->
+  <div
+    class="drop-zone"
+    [class.drag-over]="isDragOver"
+    (dragover)="onDragOver($event)"
+    (dragleave)="onDragLeave()"
+    (drop)="onDrop($event)"
+    (click)="fileInput.click()">
+
+    @if (fichier) {
+      <p>📄 {{ fichier.name }}</p>
+      <span>Cliquer ou glisser pour changer</span>
+    } @else {
+      <p>📂 Glisser votre fichier TXT ici</p>
+      <span>ou cliquer pour parcourir</span>
+    }
+
+  </div>
+
+  <!-- Input fichier caché -->
+  <input
+    #fileInput
+    type="file"
+    accept=".txt"
+    style="display: none"
+    (change)="onFileSelected($event)"
+  />
+
+  <!-- Nom du fichier de sortie -->
+  <div class="champ">
+    <label>Nom du fichier PDF de sortie</label>
+    <input
+      type="text"
+      [(ngModel)]="nomFichierSortie"
+      name="nomFichierSortie"
+      placeholder="ex: mon-fichier-converti"
+      required
+    />
+  </div>
+
+  <!--
+  <div class="champ">
+    <label>Encodage</label>
+    <select [(ngModel)]="charset" name="charset">
+      <option value="UTF-8">UTF-8 (recommandé)</option>
+      <option value="ISO-8859-1">ISO-8859-1</option>
+    </select>
+  </div>
+Encodage -->
+  <button
+    (click)="onSubmit()"
+    [disabled]="chargement || !fichier">
+    {{ chargement ? 'Conversion en cours...' : 'Convertir en PDF' }}
+  </button>
+
+</div>

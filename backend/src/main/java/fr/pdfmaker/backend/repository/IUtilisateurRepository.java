@@ -25,7 +25,7 @@ public interface IUtilisateurRepository extends JpaRepository<Utilisateur , Long
      */
     Utilisateur getUtilisateurByEmail(String email);
 
-
+    
 
 
 }

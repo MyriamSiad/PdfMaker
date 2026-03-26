@@ -1,7 +1,8 @@
 package fr.pdfmaker.backend.controller.conversion;
 
 import fr.pdfmaker.backend.model.dto.conversion.ConversionResultatDto;
-import fr.pdfmaker.backend.model.dto.conversion.TxtConverstionRequestDto;
+import fr.pdfmaker.backend.model.dto.conversion.ImageConversionRequestDto;
+import fr.pdfmaker.backend.model.dto.conversion.TxtConversionRequestDto;
 import org.springframework.http.ResponseEntity;
 
 /**
@@ -20,5 +21,9 @@ public interface IConversionController {
     ResponseEntity<byte[]> getFichier(String fullPath);
 
 
-    ResponseEntity<ConversionResultatDto> convertirFichier(TxtConverstionRequestDto request);
+    ResponseEntity<ConversionResultatDto> convertirTxt(TxtConversionRequestDto request);
+
+    ResponseEntity<ConversionResultatDto>convertirImage (ImageConversionRequestDto request);
+
+
 }

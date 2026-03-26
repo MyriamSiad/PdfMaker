@@ -9,11 +9,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class TxtConverstionRequestDto  extends ConversionRequestDto {
+public class TxtConversionRequestDto extends ConversionRequestDto {
     @NotBlank(message = "Le nom du fichier de sortie est obligatoire")
     private String nomFichierSortie;
-
-
-
 
 }

@@ -28,11 +28,11 @@ import java.nio.file.Path;
  * Si adapterALaPage = false → la page est dimensionnée aux dimensions de l'image.
  */
 @Service
-public class JpegToPdfService implements IConversionService<ImageConversionRequestDto> {
+public class ImageToPdfService implements IConversionService<ImageConversionRequestDto> {
 
-    private static final byte[] MAGIC_JPEG = {
-            (byte) 0xFF, (byte) 0xD8, (byte) 0xFF
-    };
+
+    private static final byte[] MAGIC_JPEG = { (byte)0xFF, (byte)0xD8, (byte)0xFF };
+    private static final byte[] MAGIC_PNG  = { (byte)0x89, 0x50, 0x4E, 0x47 };
 
 
     @Override
@@ -62,17 +62,21 @@ public class JpegToPdfService implements IConversionService<ImageConversionReque
             throw e;
         } catch (IOException e) {
             throw new ConversionException(
-                    "Erreur lors de la lecture du fichier JPEG : " + cheminFichier.getFileName(), e);
+                    "Erreur lors de la lecture du fichier  : " + cheminFichier.getFileName(), e);
         } catch (Exception e) {
             throw new ConversionException(
-                    "Erreur lors de la conversion JPEG → PDF : " + cheminFichier.getFileName(), e);
+                    "Erreur lors de la conversion Image  → PDF : " + cheminFichier.getFileName(), e);
         }
     }
 
     @Override
     public void verifierFormat(byte[] magicBytes) {
-        if (!commenceParSignature(magicBytes, MAGIC_JPEG)) {
-            throw new UnsupportedFormatException("JPEG", "signature FF D8 FF non trouvée");
+        boolean estJpeg = commenceParSignature(magicBytes, MAGIC_JPEG);
+        boolean estPng  = commenceParSignature(magicBytes, MAGIC_PNG);
+
+        if (!estJpeg && !estPng) {
+            throw new UnsupportedFormatException(
+                    "IMAGE", "le fichier n'est ni un JPEG ni un PNG");
         }
     }
 
@@ -103,7 +107,7 @@ public class JpegToPdfService implements IConversionService<ImageConversionReque
             return sortie.toByteArray();
 
         } catch (Exception e) {
-            throw new ConversionException("Erreur OpenPDF lors de la génération du PDF depuis JPEG", e);
+            throw new ConversionException("Erreur OpenPDF lors de la génération du PDF depuis une image", e);
         }
     }
 
