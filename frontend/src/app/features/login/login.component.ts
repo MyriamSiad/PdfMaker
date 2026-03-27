@@ -22,12 +22,12 @@ export class LoginComponent {
 
   loginRequest: LoginRequest = {
     email: '',
-    motDePasse: ''
+    motsDePasse: ''
   };
 
   loginForm = new FormGroup({
     email: new FormControl(this.loginRequest.email, [Validators.required, Validators.email]),
-    motDePasse: new FormControl(this.loginRequest.motDePasse, [Validators.required])
+    motsDePasse: new FormControl(this.loginRequest.motsDePasse, [Validators.required])
   });
   erreur: string = '';
   chargement: boolean = false;
@@ -49,11 +49,16 @@ export class LoginComponent {
   onSubmit(): void {
     this.chargement = true;
     this.erreur = '';
+    if (this.loginForm.invalid) return;
 
-    this.authService.login(this.loginRequest).subscribe({
+    const payload: LoginRequest = {
+      email: this.loginForm.value.email!,
+      motsDePasse: this.loginForm.value.motsDePasse!
+    };
+
+    this.authService.login(payload).subscribe({
       next: (value) => {
         this.chargement = false;
-        // Login réussi → on redirige vers /home
         this.router.navigate(['/home']);
       },
       error: (err) => {

@@ -3,13 +3,14 @@ import {Router, RouterLink} from '@angular/router';
 import { AuthService } from '@core/services/auth.service';
 import {  RegisterRequest} from '@core/models/auth/register/register-request.model';
 import {FormGroup, ReactiveFormsModule, FormBuilder, Validators} from '@angular/forms';
-import {MatIcon} from '@angular/material/icon';
+import {MatIcon, MatIconModule} from '@angular/material/icon';
 import {NgClass} from '@angular/common';
 
 @Component({
   selector: 'app-register',
   imports: [
     ReactiveFormsModule,
+    MatIconModule,
     RouterLink,
     MatIcon,
     NgClass

@@ -3,10 +3,11 @@ import { FormsModule } from '@angular/forms';
 import { ConversionService } from '@core/services/conversion.service';
 import {ConversionTxtResponse} from '@core/models/conversion/conversion-txt-response.model';
 import {ConversionTxtRequest} from '@core/models/conversion/conversion-txt-request.model';
+import {NgClass} from '@angular/common';
 
 @Component({
   selector: 'app-txt-to-pdf',
-  imports: [FormsModule],
+  imports: [FormsModule, NgClass],
   templateUrl: './conversion.txt.component.html',
 })
 export class TxtToPdfComponent {

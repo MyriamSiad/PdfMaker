@@ -143,14 +143,14 @@ public class UtilisateurService implements IUtilisateurService {
 
     @Override
     public UtilisateurDto loginUser(LoginDto login) throws Exception {
-            if(login == null || login.getEmail() == null || login.getMotDePasse() == null){
+            if( login.getEmail() == null || login.getMotsDePasse() == null){
                 throw new IllegalArgumentException("Les données de connexion sont invalides ! ");
             }
             Utilisateur user = utilisateurRepository.getUtilisateurByEmail(login.getEmail().trim());
             if(user == null){
                 throw new LoginIncorrectException("Login ou mot de passe incorrect. Veuillez réessayer.");
             }
-            if(!verifyPassword(login.getMotDePasse(), user.getPasswordHash())){
+            if(!verifyPassword(login.getMotsDePasse(), user.getPasswordHash())){
                 throw new LoginIncorrectException("Mots de passe incorrect ! ");
             }
         return convertUserToUserDto(user);

@@ -1,19 +1,133 @@
 
-<nav class="navbar">
-  <div class="navbar-logo">
-    <img src="assets/logo.png" alt="My App Logo" />
-  </div>
-  <ul class="navbar-links">
-    <li><a routerLink="/home">Home</a></li>
-    <li><a routerLink="/login">login</a></li>
-    <li><a routerLink="/register">register</a></li>
-    <li><a routerLink="/txt-to-pdf">Txt to pdf </a></li>
-    <div class="navbar-actions">
-      <button (click)="logout()">Logout</button>
-    </div>
-  </ul>
-  <div class="navbar-actions">
-    <!-- Add login/logout buttons or user-related actions here -->
-  </div>
-</nav>
 
+
+
+
+<!-- Sidebar Navigation -->
+<aside [class.w-64]="!isCollapsed()"
+       [class.w-21]="isCollapsed()"  class=" transition-all  duration-150  fixed top-0 left-0 h-screen w-64 bg-white/90 backdrop-blur-xl border-r border-gray-100 shadow-xl flex flex-col z-50">
+
+
+  <div class="flex justify-end px-3 py-3">
+    <button
+      (click)="toggle()"
+      class="w-9 h-9 rounded-xl bg-gray-100 hover:bg-[#1D6FCC] text-gray-500 hover:text-white
+           flex items-center justify-center transition-all duration-200 hover:shadow-md active:scale-95">
+
+      @if (isCollapsed()) {
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+        </svg>
+      } @else {
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+        </svg>
+      }
+
+    </button>
+  </div>
+  <!-- Logo -->
+  <div class="px-6 py-6 border-b border-gray-100">
+    <div class="flex items-center gap-3">
+      <div class="w-9 h-9 rounded-xl bg-[#1D6FCC] flex items-center justify-center shadow-md">
+        <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round"
+                d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+        </svg>
+      </div>
+
+      <span [class.hidden]="isCollapsed()" class="text-xl font-extrabold text-[#1D6FCC] tracking-tight">PDFMaker</span>
+    </div>
+  </div>
+
+  <!-- Navigation principale -->
+  <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+
+    <!-- Label section -->
+    <p  [class.hidden]="isCollapsed()" class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-widest mb-2">Navigation</p>
+
+    <!-- Home -->
+    <a routerLink="/home" routerLinkActive="bg-[#1D6FCC] text-white shadow-md"
+       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-600 hover:bg-blue-50 hover:text-[#1D6FCC] transition-all duration-200 group">
+      <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+        <path stroke-linecap="round" stroke-linejoin="round"
+              d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+      </svg>
+      <span [class.hidden]="isCollapsed()"  class="text-sm font-medium">Accueil</span>
+    </a>
+
+    <!-- Label section Outils -->
+    <p  [class.hidden]="isCollapsed()" class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-widest mt-5 mb-2">Outils PDF</p>
+
+    <!-- Annotation -->
+    <a routerLink="/annotate" routerLinkActive="bg-[#1D6FCC] text-white shadow-md"
+       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-600 hover:bg-blue-50 hover:text-[#1D6FCC] transition-all duration-200">
+      <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+        <path stroke-linecap="round" stroke-linejoin="round"
+              d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Z" />
+      </svg>
+      <span  [class.hidden]="isCollapsed()" class="text-sm font-medium">Annotation</span>
+    </a>
+
+    <!-- Séparation -->
+    <a routerLink="/split" routerLinkActive="bg-[#1D6FCC] text-white shadow-md"
+       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-600 hover:bg-blue-50 hover:text-[#1D6FCC] transition-all duration-200">
+      <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+        <path stroke-linecap="round" stroke-linejoin="round"
+              d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z" />
+      </svg>
+      <span [class.hidden]="isCollapsed()"  class="text-sm font-medium">Séparation</span>
+    </a>
+
+    <!-- Fusion -->
+    <a routerLink="/merge" routerLinkActive="bg-[#1D6FCC] text-white shadow-md"
+       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-600 hover:bg-blue-50 hover:text-[#1D6FCC] transition-all duration-200">
+      <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+        <path stroke-linecap="round" stroke-linejoin="round"
+              d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
+      </svg>
+      <span [class.hidden]="isCollapsed()"  class="text-sm font-medium">Fusion</span>
+    </a>
+
+    <!-- Convertisseur -->
+    <a routerLink="/convert" routerLinkActive="bg-[#1D6FCC] text-white shadow-md"
+       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-600 hover:bg-blue-50 hover:text-[#1D6FCC] transition-all duration-200">
+      <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+        <path stroke-linecap="round" stroke-linejoin="round"
+              d="M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 0 0-3.7-3.7 48.678 48.678 0 0 0-7.324 0 4.006 4.006 0 0 0-3.7 3.7c-.017.22-.032.441-.046.662M19.5 12l3-3m-3 3-3-3m-12 3c0 1.232.046 2.453.138 3.662a4.006 4.006 0 0 0 3.7 3.7 48.656 48.656 0 0 0 7.324 0 4.006 4.006 0 0 0 3.7-3.7c.017-.22.032-.441.046-.662M4.5 12l3 3m-3-3-3 3" />
+      </svg>
+      <span  [class.hidden]="isCollapsed()" class="text-sm font-medium">Convertisseur</span>
+      <!-- Badge formats supportés -->
+      <span [class.hidden]="isCollapsed()"  class="ml-auto text-xs bg-[#F5A623]/20 text-[#F5A623] font-semibold px-2 py-0.5 rounded-full">4</span>
+    </a>
+
+  </nav>
+
+  <!-- Profil utilisateur + Logout -->
+  <div class="px-3 py-4 border-t border-gray-100">
+
+    <!-- Infos utilisateur -->
+    <div class="flex items-center gap-3 px-3 py-2 mb-2">
+      <div class="w-8 h-8 rounded-full bg-linear-to-br from-[#1D6FCC] to-[#F5A623] flex items-center justify-center shrink-0">
+        <span  class="text-white text-xs font-bold">{{ getUserInitials()}}</span>
+      </div>
+      <div class="flex-1 min-w-0">
+        <p [class.hidden]="isCollapsed()"  class="text-sm font-semibold text-gray-800 truncate">{{ getUserProfil()?.nom }} {{getUserProfil()?.prenom}}</p>
+        <p [class.hidden]="isCollapsed()"  class="text-xs text-gray-400 truncate">{{ getUserProfil()?.email }}</p>
+      </div>
+    </div>
+
+    <!-- Bouton Logout -->
+    <button
+      (click)="logout()"
+      class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-500 hover:bg-red-50 hover:text-red-500 transition-all duration-200 group">
+      <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+        <path stroke-linecap="round" stroke-linejoin="round"
+              d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
+      </svg>
+      <span [class.hidden]="isCollapsed()"  class="text-sm font-medium">Se déconnecter</span>
+    </button>
+
+  </div>
+
+</aside>

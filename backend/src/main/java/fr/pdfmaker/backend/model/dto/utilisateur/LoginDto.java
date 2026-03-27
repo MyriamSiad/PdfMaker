@@ -9,5 +9,5 @@ import lombok.Setter;
 public class LoginDto {
 
     private String email;
-    private String motDePasse;
+    private String motsDePasse;
 }
