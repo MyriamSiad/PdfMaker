@@ -12,6 +12,7 @@ import fr.pdfmaker.backend.exception.UnsupportedFormatException;
 import fr.pdfmaker.backend.model.dto.conversion.ConversionResultatDto;
 import fr.pdfmaker.backend.model.dto.conversion.ImageConversionRequestDto;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -42,18 +43,18 @@ public class ImageToPdfService implements IConversionService<ImageConversionRequ
 
     @Override
     public ConversionResultatDto convert(ImageConversionRequestDto request) {
+        MultipartFile fichier = request.getFichier();
 
-        Path cheminFichier = request.getCheminFichier();
+        if (fichier == null || fichier.isEmpty()) {
 
-        if (!Files.exists(cheminFichier)) {
-            throw new FichierIntrouvableException(cheminFichier);
+            throw new FichierIntrouvableException("Aucun fichier reçu");
         }
 
         try {
-            byte[] magicBytes = lireMagicBytes(cheminFichier);
+            byte[] magicBytes = lireMagicBytes(fichier.getBytes());
             verifierFormat(magicBytes);
 
-            byte[] donneesImage = Files.readAllBytes(cheminFichier);
+            byte[] donneesImage = fichier.getBytes();
             byte[] contenuPdf   = genererPdf(donneesImage, request.isAdapterALaPage());
 
             return new ConversionResultatDto(request.getNomFichierSortie() + ".pdf", contenuPdf);
@@ -62,10 +63,10 @@ public class ImageToPdfService implements IConversionService<ImageConversionRequ
             throw e;
         } catch (IOException e) {
             throw new ConversionException(
-                    "Erreur lors de la lecture du fichier  : " + cheminFichier.getFileName(), e);
+                    "Erreur lors de la lecture du fichier  : " + fichier.getName(), e);
         } catch (Exception e) {
             throw new ConversionException(
-                    "Erreur lors de la conversion Image  → PDF : " + cheminFichier.getFileName(), e);
+                    "Erreur lors de la conversion Image  → PDF : " + fichier.getName(), e);
         }
     }
 
@@ -138,17 +139,24 @@ public class ImageToPdfService implements IConversionService<ImageConversionRequ
 
     // ---------------------------------------------------------------------- utilitaires privés
 
-    private byte[] lireMagicBytes(Path chemin) throws IOException {
+    /**
+     * Lit les 8 premiers octets du fichier pour en extraire les magic bytes.
+     * Si le fichier est plus petit que 8 octets, retourne null.
+     * */
+    private byte[] lireMagicBytes(byte[] bytes) throws IOException {
         byte[] buffer = new byte[8];
-        try (var stream = Files.newInputStream(chemin)) {
-            int lu = stream.read(buffer);
-            if (lu < buffer.length) {
-                byte[] tronque = new byte[lu];
-                System.arraycopy(buffer, 0, tronque, 0, lu);
-                return tronque;
+
+        try{
+            for (int i = 0; i < buffer.length; i++) {
+                buffer[i] = (byte) bytes[i];
             }
+
+            return buffer;
         }
-        return buffer;
+        catch (IndexOutOfBoundsException e) {
+
+            return null;
+        }
     }
 
     private boolean commenceParSignature(byte[] magicBytes, byte[] signature) {

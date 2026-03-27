@@ -27,8 +27,5 @@ public class ImageConversionRequestDto extends ConversionRequestDto {
 
     private boolean adapterALaPage = true;
 
-    private Path cheminFichier;
-
-    private Path cheminSortie;
 
 }
