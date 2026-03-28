@@ -44,7 +44,7 @@ public class ImageToPdfService implements IConversionService<ImageConversionRequ
         return null;
     }
 
-    @Override
+
     public ConversionResultatDto convert(ImageConversionRequestDto request) {
         MultipartFile fichier = request.getFichier();
 
@@ -147,7 +147,8 @@ public class ImageToPdfService implements IConversionService<ImageConversionRequ
      * Lit les 8 premiers octets du fichier pour en extraire les magic bytes.
      * Si le fichier est plus petit que 8 octets, retourne null.
      * */
-    private byte[] lireMagicBytes(byte[] bytes) throws IOException {
+
+    public byte[] lireMagicBytes(byte[] bytes) throws IOException {
         byte[] buffer = new byte[8];
 
         try{
@@ -163,7 +164,8 @@ public class ImageToPdfService implements IConversionService<ImageConversionRequ
         }
     }
 
-    private boolean commenceParSignature(byte[] magicBytes, byte[] signature) {
+    @Override
+   public  boolean commenceParSignature(byte[] magicBytes, byte[] signature) {
         if (magicBytes.length < signature.length) return false;
         for (int i = 0; i < signature.length; i++) {
             if (magicBytes[i] != signature[i]) return false;

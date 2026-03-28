@@ -41,7 +41,7 @@ public class TxtToPdfService  implements IConversionService <TxtConversionReques
     }
 
 
-    @Override
+
     public ConversionResultatDto convert(TxtConversionRequestDto request) {
         MultipartFile fichier = request.getFichier();
 
@@ -139,7 +139,8 @@ public class TxtToPdfService  implements IConversionService <TxtConversionReques
         }
     }*/
 
-    private  boolean commenceParSignature(byte[] data, byte[] signature) {
+    @Override
+    public   boolean commenceParSignature(byte[] data, byte[] signature) {
         if (data.length < signature.length) {
             return false;
         }

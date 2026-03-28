@@ -5,6 +5,9 @@ import fr.pdfmaker.backend.exception.FichierIntrouvableException;
 import fr.pdfmaker.backend.exception.UnsupportedFormatException;
 import fr.pdfmaker.backend.model.dto.conversion.ConversionRequestDto;
 import fr.pdfmaker.backend.model.dto.conversion.ConversionResultatDto;
+import fr.pdfmaker.backend.model.dto.conversion.ImageConversionRequestDto;
+
+import java.io.IOException;
 
 public interface IConversionService <T extends ConversionRequestDto> {
 
@@ -30,4 +33,18 @@ public interface IConversionService <T extends ConversionRequestDto> {
      * @throws UnsupportedFormatException si le format ne correspond pas
      */
     void verifierFormat(byte[] magicBytes);
+
+    /* *
+        Vérifie si les magic bytes commencent par la signature attendue.
+     *
+     * @param magicBytes premiers octets du fichier
+     * @param signature  signature attendue (ex. {0xFF, 0xD8, 0xFF} pour JPEG)
+     * @return true si magicBytes commence par signature, false sinon
+     **/
+    boolean commenceParSignature(byte[] magicBytes, byte[] signature);
+
+
+
+
+
 }

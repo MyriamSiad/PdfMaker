@@ -20,7 +20,7 @@ export class ImageToPdfComponent {
   success: boolean = false;
   chargement: boolean = false;
   isDragOver: boolean = false;
-  adapterALaPage: boolean = false;
+  adapterALaPage: boolean = true;
 
 
   constructor(private conversionService: ConversionService) {}
@@ -28,6 +28,7 @@ export class ImageToPdfComponent {
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
+      this.nomFichierSortie = this.nomFichierSortieSerialize(this.fichier?.name || "mon-image-convertit");
       this.selectionnerFichier(input.files[0]);
     }
   }
@@ -48,22 +49,27 @@ onDrop(event: DragEvent): void {
   const files = event.dataTransfer?.files;
   if (files && files.length > 0) {
     this.selectionnerFichier(files[0]);
+    this.nomFichierSortie = this.nomFichierSortieSerialize(this.fichier?.name || "mon-image-convertit");
   }
 }
 
 
   private selectionnerFichier(fichier: File): void {
     if (!fichier.name.endsWith('.jpg') && !fichier.name.endsWith('.jpeg') && !fichier.name.endsWith('.png')) {
-      this.erreur = 'Seuls les fichiers .txt sont acceptés';
+      this.erreur = 'Seuls les fichiers .jpeg , .jpg , .webpp, .png sont acceptés';
       return;
     }
     this.fichier = fichier;
     this.erreur = '';
 
 
-    this.nomFichierSortie = fichier.name.replace('.jpeg', '');
-    this.nomFichierSortie = fichier.name.replace('.png', '');
   }
+  nomFichierSortieSerialize(nomFichierSortie: string): string {
+    return nomFichierSortie
+      .replace(/\.(jpeg|jpg|png|webp)$/i, '') // gère aussi les majuscules (.JPEG, .PNG)
+      .trim();
+  }
+
 
   onSubmit(): void {
     if (!this.fichier || !this.nomFichierSortie) return;
@@ -73,13 +79,16 @@ onDrop(event: DragEvent): void {
     this.success = false;
 
 
+
     const  conversionImageRequest  : ConversionImageRequestModel = new ConversionImageRequestModel(
-      this.nomFichierSortie, this.adapterALaPage,  this.fichier)
+      this.nomFichierSortieSerialize(this.nomFichierSortie), this.adapterALaPage,  this.fichier)
 
     this.conversionService.convertirImageEnPdf(  conversionImageRequest).subscribe({
       next: (resultat: ConversionResponseModel) => {
         this.chargement = false;
         this.success = true;
+
+
         this.conversionService.telechargerPdf(resultat);
       },
       error: (err: any) => {
