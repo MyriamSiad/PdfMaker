@@ -24,7 +24,7 @@ public class ConversionController implements IConversionController {
 
     @Qualifier("imageToPdfService")
     @Autowired
-    private IConversionService<ImageConversionRequestDto> jpegToPdfService;
+    private IConversionService<ImageConversionRequestDto> imgToPdfService;
 
     @Override
     public ResponseEntity<byte[]> getFichier(String fullPath) {
@@ -34,7 +34,7 @@ public class ConversionController implements IConversionController {
 
     @Override
     @PostMapping(value = "/txt-to-pdf" , consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ConversionResultatDto> convertirTxt (TxtConversionRequestDto fichier){
+    public ResponseEntity<ConversionResultatDto> convertirTxt ( @ModelAttribute TxtConversionRequestDto fichier){
 
         if (fichier == null || fichier.getFichier().isEmpty() || fichier.getNomFichierSortie() == null || fichier.getNomFichierSortie().isBlank()) {
             return ResponseEntity.badRequest().build();
@@ -49,16 +49,16 @@ public class ConversionController implements IConversionController {
     }
 
     @Override
-    @PostMapping("/jpeg-to-pdf")
-    public ResponseEntity<ConversionResultatDto> convertirImage(@RequestBody ImageConversionRequestDto request) {
+    @PostMapping(value = "/image-to-pdf", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ConversionResultatDto> convertirImage  (@ModelAttribute ImageConversionRequestDto request) {
 
         if (request == null
-                || request.getCheminFichier() == null
+                || request.getFichier() == null
                 || request.getNomFichierSortie() == null) {
             return ResponseEntity.badRequest().build();
         }
 
-        ConversionResultatDto resultat = jpegToPdfService.convert(request);
+        ConversionResultatDto resultat = imgToPdfService.convert(request);
         return ResponseEntity.ok(resultat);
     }
 

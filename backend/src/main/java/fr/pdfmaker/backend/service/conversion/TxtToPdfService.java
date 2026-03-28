@@ -128,7 +128,7 @@ public class TxtToPdfService  implements IConversionService <TxtConversionReques
     }
 
 
-    private  byte[] lireMagicBytes(Path chemin) throws IOException {
+    /*private  byte[] lireMagicBytes(Path chemin) throws IOException {
         int maxLen = FORMATS_BINAIRES_CONNUS.stream()
                 .mapToInt(s -> s.length)
                 .max()
@@ -137,7 +137,7 @@ public class TxtToPdfService  implements IConversionService <TxtConversionReques
         try (var input = Files.newInputStream(chemin)) {
             return input.readNBytes(maxLen);
         }
-    }
+    }*/
 
     private  boolean commenceParSignature(byte[] data, byte[] signature) {
         if (data.length < signature.length) {

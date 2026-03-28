@@ -5,4 +5,6 @@ export interface ConversionTxtResponse {
   success: boolean;
  fichierPdf : string;
 
+
+
 }

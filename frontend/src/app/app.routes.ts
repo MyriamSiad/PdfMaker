@@ -17,6 +17,9 @@ import {HomeComponent} from '@features/home/home.component';
        { path: 'txt-to-pdf',
     loadComponent: () => import('@features/conversion/conversion.txt.component').then(m => m.TxtToPdfComponent)
 },
+       { path: 'img-to-pdf',
+         loadComponent: () => import('@features/conversion/image-conversion').then(m => m.ImageToPdfComponent)
+       },
      ]
    },
    {

@@ -3,6 +3,8 @@ import {ConversionTxtResponse} from '@core/models/conversion/conversion-txt-resp
 import {ConversionTxtRequest} from '@core/models/conversion/conversion-txt-request.model';
 import {Observable} from 'rxjs';
 import {Injectable} from '@angular/core';
+import {ConversionImageRequestModel} from '@core/models/conversion/conversion-image-request.model';
+import {ConversionResponseModel} from '@core/models/conversion/conversion-response.model';
 
 
 @Injectable({
@@ -17,15 +19,27 @@ export class  ConversionService {
   convertirTxtEnPdf(request : ConversionTxtRequest) : Observable<ConversionTxtResponse>  {
 
     const formData = new FormData();
-    formData.append('fichier', request.nomFichierSortie);
+    //formData.append('fichier', request.nomFichierSortie);
     formData.append('nomFichierSortie', request.nomFichierSortie);
     formData.append('fichier', request.fichier as File );
 
     return this.http.post<ConversionTxtResponse>(`${this.API_URL}/txt-to-pdf`, formData);
   }
 
+   convertirImageEnPdf(request : ConversionImageRequestModel) : Observable<ConversionResponseModel> {
 
-  telechargerPdf(resultat: ConversionTxtResponse): void {
+    const formData = new FormData();
+    formData.append ('fichier' , request.fichier as File );
+    formData.append('nomFichierSortie', request.nomFichierSortie);
+    formData.append('adapterALaPage', String(request.adapterALaPage) );
+
+    return this.http.post<ConversionResponseModel> (`${this.API_URL}/image-to-pdf`, formData);
+
+
+
+   }
+
+  telechargerPdf(resultat: ConversionResponseModel): void {
 
     const byteCharacters = atob(resultat.fichierPdf);
 

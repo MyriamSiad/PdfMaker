@@ -34,7 +34,10 @@ public class ImageToPdfService implements IConversionService<ImageConversionRequ
 
     private static final byte[] MAGIC_JPEG = { (byte)0xFF, (byte)0xD8, (byte)0xFF };
     private static final byte[] MAGIC_PNG  = { (byte)0x89, 0x50, 0x4E, 0x47 };
-
+    private static final byte[] MAGIC_WEBP = { 0x52, 0x49, 0x46, 0x46 }; // RIFF
+    //private static final byte[] MAGIC_BMP  = { 0x42, 0x4D };              // BM
+    //private static final byte[] MAGIC_GIF  = { 0x47, 0x49, 0x46, 0x38 }; // GIF8
+    //private static final byte[] MAGIC_TIFF = { 0x49, 0x49, 0x2A, 0x00 }; // Little-endian
 
     @Override
     public ConversionResultatDto convertToPdf(String inputPathFichier) {
@@ -74,10 +77,11 @@ public class ImageToPdfService implements IConversionService<ImageConversionRequ
     public void verifierFormat(byte[] magicBytes) {
         boolean estJpeg = commenceParSignature(magicBytes, MAGIC_JPEG);
         boolean estPng  = commenceParSignature(magicBytes, MAGIC_PNG);
+        boolean estWebp = commenceParSignature(magicBytes, MAGIC_WEBP);
 
         if (!estJpeg && !estPng) {
             throw new UnsupportedFormatException(
-                    "IMAGE", "le fichier n'est ni un JPEG ni un PNG");
+                    "IMAGE", "le fichier n'est ni un JPEG ni un PNG, ni un WEBP");
         }
     }
 
