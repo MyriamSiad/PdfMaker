@@ -1,0 +1,22 @@
+
+<div class="grid grid-cols-2  pt-10  gap-4 mb-2 content-center">
+
+  <button (click)="mode = 'txt'"
+    [ngClass]="mode === 'txt' ? 'border-[#1D6FCC] bg-blue-50' : 'border-gray-200 bg-white'"
+    class="p-4 rounded-2xl border-2 transition-all duration-200 text-left">
+    <p class="font-semibold text-gray-800">TXT → PDF</p>
+    <p class="text-xs text-gray-400 mt-1">Fichiers texte brut</p>
+  </button>
+
+  <button (click)="mode = 'image'"
+    [ngClass]="mode === 'image' ? 'border-[#1D6FCC] bg-blue-50' : 'border-gray-200 bg-white'"
+    class="p-4 rounded-2xl border-2 transition-all duration-200 text-left">
+    <p class="font-semibold text-gray-800">Image → PDF</p>
+    <p class="text-xs text-gray-400 mt-1">JPEG, PNG, WEBP</p>
+  </button>
+
+</div>
+
+<!-- Formulaire qui change selon le mode -->
+@if (mode === 'txt') { <app-txt-to-pdf /> }
+@if (mode === 'image') { <app-image-to-pdf/> }

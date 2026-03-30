@@ -1,3 +1,9 @@
+@if (isLoggedIn()) {
+  <app-navbar (collapsedChange)="onNavbarToggle($event)" />
+}
 
-@if (this.isLoggedIn()) { <app-navbar /> }
-<router-outlet />
+<div class="transition-all duration-150"
+     [class.ml-64]="isLoggedIn() && !collapsed"
+     [class.ml-21]="isLoggedIn() && collapsed">
+  <router-outlet />
+</div>

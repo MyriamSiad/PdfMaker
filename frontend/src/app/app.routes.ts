@@ -20,6 +20,9 @@ import {HomeComponent} from '@features/home/home.component';
        { path: 'img-to-pdf',
          loadComponent: () => import('@features/conversion/image-conversion').then(m => m.ImageToPdfComponent)
        },
+       { path : 'convert',
+         loadComponent : () => import ('@features/conversion/conversion.component').then(m => m.ConversionComponent)
+       }
      ]
    },
    {

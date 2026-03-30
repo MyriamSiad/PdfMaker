@@ -16,4 +16,11 @@ export class App {
   authService = inject(AuthService);
   isLoggedIn = computed(() => this.authService.estConnecte());
   protected readonly title = signal('frontend');
+
+
+  collapsed = false;
+
+  onNavbarToggle(isCollapsed: boolean): void {
+    this.collapsed = isCollapsed;
+  }
 }

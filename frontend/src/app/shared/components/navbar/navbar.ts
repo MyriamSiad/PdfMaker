@@ -1,4 +1,4 @@
-import {Component, inject, signal} from '@angular/core';
+import {Component, EventEmitter, inject, Output, signal} from '@angular/core';
 import {Router, RouterLink, RouterLinkActive} from '@angular/router';
 import {AuthService} from '@services/auth.service';
 import {ProfilResponse} from '@core/models/auth/login/profil-response.model';
@@ -21,9 +21,11 @@ export class Navbar {
   authService = inject(AuthService);
   router = inject(Router);
   isCollapsed = signal(false);
+  @Output() collapsedChange = new EventEmitter<boolean>();
 
   toggle(): void {
     this.isCollapsed.update(v => !v);
+    this.collapsedChange.emit(this.isCollapsed());
   }
 
   logout(): void {
