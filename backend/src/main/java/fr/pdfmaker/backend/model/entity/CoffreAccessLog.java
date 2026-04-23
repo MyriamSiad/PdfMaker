@@ -7,7 +7,7 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "utilisateur")
+@Table(name = "coffre_access_log")
 @Getter
 @Setter
 @ToString
