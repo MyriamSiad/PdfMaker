@@ -25,8 +25,9 @@ public class Utilisateur {
 
     @Id
     @GeneratedValue (strategy = GenerationType.IDENTITY)
+    @Column (name = "id_user")
     private Long idUser;
-//idUser, nom, prenom, email, passwordHash,dateCreationCompte
+
     @Column (nullable = false , length = 48)
     private String nom;
 
@@ -43,16 +44,19 @@ public class Utilisateur {
     @CreationTimestamp
     private Instant dateCreationCompte;
 
-    @OneToMany(mappedBy = "utilisateur")
-    private List<FichierPdf> listFichiersPdf = new ArrayList<>();
+    @Column(name = "salt", length = 255, nullable = false)
+    private String salt;
 
+    @OneToMany(mappedBy = "utilisateur", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Operation> operations = new HashSet<>();
 
-    @OneToMany(mappedBy = "utilisateur")
-    private List<Operation> operations = new ArrayList<>();
+    @OneToMany(mappedBy = "utilisateur", cascade = CascadeType.ALL)
+    private Set<CoffreAccessLog> accessLogs = new HashSet<>();
 
+    @OneToMany(mappedBy = "utilisateur", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<DossierVirtuel> dossiers = new HashSet<>();
 
-    @OneToMany(mappedBy = "utilisateur")
-    private Set<Tag> tags = new HashSet<>();
-
-
+    @OneToMany(mappedBy = "utilisateur", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Fichier> fichiers = new HashSet<>();
 }
+
