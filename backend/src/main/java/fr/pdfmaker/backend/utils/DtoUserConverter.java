@@ -18,6 +18,8 @@ public final  class DtoUserConverter {
         user.setPasswordHash(userDto.getPasswordHash());
         user.setNom(userDto.getNom());
         user.setEmail(userDto.getEmail());
+        user.setSalt(userDto.getSalt());
+        user.setMasterKey(userDto.getMasterKey());
         return user;
     }
 

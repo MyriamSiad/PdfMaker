@@ -40,6 +40,9 @@ public class Utilisateur {
     @Column (nullable = false , length = 250)
     private String passwordHash;
 
+    @Column (nullable = false , length = 250)
+    private String masterKey;
+
     @Column (nullable = true , length = 64)
     @CreationTimestamp
     private Instant dateCreationCompte;

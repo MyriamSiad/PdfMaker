@@ -27,6 +27,7 @@ public class InscriptionRequestDto {
     @ValidPassword
     private String passwordHash;
     private LocalDate dateCreationCompte;
-
+    private String salt;
+    private String masterKey;
 
 }
