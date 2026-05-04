@@ -7,22 +7,13 @@ import fr.pdfmaker.backend.model.dto.utilisateur.LoginDto;
 import fr.pdfmaker.backend.model.dto.utilisateur.UtilisateurDto;
 import fr.pdfmaker.backend.model.entity.Utilisateur;
 import fr.pdfmaker.backend.repository.IUtilisateurRepository;
+import fr.pdfmaker.backend.service.coffrefort.EncryptService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.method.P;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
-import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.PBEKeySpec;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.security.spec.InvalidKeySpecException;
-import java.util.HexFormat;
-
 import static fr.pdfmaker.backend.utils.DtoUserConverter.*;
-import static java.util.Base64.getEncoder;
 
 @Service
 public class UtilisateurService implements IUtilisateurService {
@@ -30,7 +21,8 @@ public class UtilisateurService implements IUtilisateurService {
     @Autowired
     private IUtilisateurRepository utilisateurRepository;
 
-
+    @Autowired
+    private EncryptService encryptService;
 
     @Override
     public UtilisateurDto getUtilsateur(long id) throws Exception {
@@ -111,26 +103,6 @@ public class UtilisateurService implements IUtilisateurService {
     }
 
 
-    private byte [] masterKeyGenerator( ) {
-
-        byte[] masterKeyBytes = new byte[32];
-        SecureRandom random = new SecureRandom();
-        random.nextBytes(masterKeyBytes);
-        return masterKeyBytes;
-    }
-
-    private String chiffrageMasterKey (byte [] masterKey, String password, String salt) {
-        Pbkdf2PasswordEncoder.SecretKeyFactoryAlgorithm algorithmSha256 = Pbkdf2PasswordEncoder.SecretKeyFactoryAlgorithm.PBKDF2WithHmacSHA256;
-        PBEKeySpec spec = new PBEKeySpec(password.toCharArray(), salt.getBytes(), 65536, 256);
-
-        try {
-           byte [] secretKey = SecretKeyFactory.getInstance(algorithmSha256.toString()).generateSecret(spec).getEncoded();
-            return getEncoder().encodeToString(secretKey);
-        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-            throw new RuntimeException("Erreur lors du chiffrage de la master key : " + e.getMessage());
-        }
-    }
-
 
     @Override
     @Transactional
@@ -139,8 +111,8 @@ public class UtilisateurService implements IUtilisateurService {
             verifyUserInfo(user);
             String passwordHash = hashPassword(user.getPasswordHash());
             user.setPasswordHash(passwordHash);
-            user.setSalt(saltGenerator());
-            String masterKey = chiffrageMasterKey(masterKeyGenerator(), user.getPasswordHash(), user.getSalt());
+            user.setSalt(encryptService.saltGenerator());
+            String masterKey = encryptService.chiffrageMasterKey(encryptService.masterKeyGenerator(), encryptService.secretKeyGenerator(user.getPasswordHash(), user.getSalt()));
             user.setMasterKey(masterKey);
             Utilisateur _user = convertUserDtoToUser(user);
 
@@ -165,18 +137,6 @@ public class UtilisateurService implements IUtilisateurService {
             //userToUpdate.setPasswordHash(hashPassword(user.getPasswordHash()));
            //utilisateurRepository.save(userToUpdate);
             return user.getIdUser();
-        }
-
-
-    /**
-     * Methode qui permet de générer un hash aléatoire pour le salt de l'utilisateur, pour renforcer la sécurité du mot de passe hashé dans la bdd.
-     * @return un hash, pour le salt dans la table utilisateur
-     */
-        public String saltGenerator(){
-            SecureRandom random = new SecureRandom();
-            byte[] saltBytes = new byte[16];
-            random.nextBytes(saltBytes);
-            return HexFormat.of().formatHex(saltBytes);
         }
 
     @Override
