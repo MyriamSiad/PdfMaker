@@ -2,6 +2,7 @@ package fr.pdfmaker.backend.utils;
 
 import fr.pdfmaker.backend.model.dto.utilisateur.InscriptionRequestDto;
 import fr.pdfmaker.backend.model.dto.utilisateur.UtilisateurDto;
+import fr.pdfmaker.backend.model.dto.utilisateur.UtilisateurSecretDetailDto;
 import fr.pdfmaker.backend.model.entity.Utilisateur;
 
 public final  class DtoUserConverter {
@@ -37,5 +38,17 @@ public final  class DtoUserConverter {
         userDto.setIdUser(user.getIdUser());
 
         return userDto;
+    }
+
+    public UtilisateurSecretDetailDto convertUserToUserSecretDetailDto (Utilisateur user){
+        UtilisateurSecretDetailDto userSecretDetailDto = new UtilisateurSecretDetailDto();
+
+        userSecretDetailDto.setIdUser(user.getIdUser());
+        userSecretDetailDto.setPasswordHash(user.getPasswordHash());
+        userSecretDetailDto.setSalt(user.getSalt());
+        userSecretDetailDto.setMasterKey(user.getMasterKey());
+
+
+        return userSecretDetailDto;
     }
 }

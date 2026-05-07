@@ -23,7 +23,8 @@ public interface IUtilisateurRepository extends JpaRepository<Utilisateur , Long
      * @return  un objet utilisateur.
      *
      */
-    Utilisateur getUtilisateurByEmail(String email);
+    Utilisateur getUtilisateurByEmail(String email); 
+
 
     
 

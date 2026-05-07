@@ -1,12 +1,20 @@
 package fr.pdfmaker.backend.service.coffrefort;
 
+import fr.pdfmaker.backend.model.dto.utilisateur.UtilisateurSecretDetailDto;
+import fr.pdfmaker.backend.repository.IUtilisateurRepository;
+import fr.pdfmaker.backend.service.commun.FormatVerification;
+import fr.pdfmaker.backend.utils.DtoUserConverter;
 import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.*;
+import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.io.ByteArrayOutputStream;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -20,7 +28,10 @@ import static java.util.Base64.getEncoder;
 @NoArgsConstructor
 public class EncryptService {
 
+    @Autowired
+    IUtilisateurRepository iUtilisateurRepository;
 
+    FormatVerification verifyFormat = new FormatVerification();
     public byte [] masterKeyGenerator( ) {
 
         byte[] masterKeyBytes = new byte[32];
@@ -28,6 +39,8 @@ public class EncryptService {
         random.nextBytes(masterKeyBytes);
         return masterKeyBytes;
     }
+
+
 
     /**
      * Cette méthode permet de chiffrer la masterKey avec le mot de passe de l'utilisateur et le salt, en utilisant l'algorithme PBKDF2WithHmacSHA256 pour dériver une clé secrète à partir du mot de passe et du salt, puis en utilisant cette clé secrète pour chiffrer la masterKey avec l'algorithme AES/GCM/PKCS5Padding. La masterKey chiffrée est ensuite encodée en Base64 pour être stockée dans la base de données.
@@ -73,6 +86,14 @@ public class EncryptService {
         }
     }
 
+    public byte [] generateIv(){
+        byte[] iv = new byte[16];
+        SecureRandom random = new SecureRandom();
+        random.nextBytes(iv);
+        return iv;
+    }
+
+
     public byte [] dechiffrageMasterKey(String encryptedMasterKey, byte [] secretKey) {
         try {
             Cipher cipher = Cipher.getInstance("AES/GCM/noPadding");
@@ -100,28 +121,78 @@ public class EncryptService {
     }
 
 
-
-
-
-   /* public byte [] encryptPdf(byte [] fichierPdf, String masterKey ) {
-        if(verifyFormatPdf(fichierPdf)){
-            try{
-
-
-
-            }catch(Exception e){
-
+    public UtilisateurSecretDetailDto userSecretDetail (Long idUser) throws Exception{
+        try{
+            if (!iUtilisateurRepository.existsById(idUser)){
+                throw new IllegalArgumentException("Cet utilisateur n'existe pas !  ");
             }
-            //TODO : implémenter la logique d'encryption du PDF
+            DtoUserConverter converter = new DtoUserConverter();
+            return converter.convertUserToUserSecretDetailDto(iUtilisateurRepository.findByIdUser(idUser));
+        }catch (Exception e){
+            throw new Exception("Erreur lors de la vérification de l'existence de l'utilisateur : " + e.getMessage());
         }
 
 
-        return null;
+    }
 
-    }*/
 
-    public byte[] decryptPdf(byte [] fichierPdf) {
-        //TODO : Implémenter la logique de décryption du PDF
-        return null;
+   public byte [] encryptPdf( Long idUser, byte [] fichierPdf) throws Exception {
+
+            UtilisateurSecretDetailDto userSecretDetailDto = userSecretDetail(idUser);
+            try{
+                if (!verifyFormat.verifyFormatPdf(fichierPdf)) {
+                    //throw new EncryptionException("Format pdf invalide ");
+                }
+                    String masterKey= userSecretDetailDto.getMasterKey();
+                    byte [] secretKey =  secretKeyGenerator (userSecretDetailDto.getPasswordHash() , userSecretDetailDto.getSalt());
+                    byte [] iv = generateIv();
+                    byte [] masterKeyBrute = dechiffrageMasterKey(masterKey , secretKey);
+                    SecretKey secretKey_ = new SecretKeySpec(masterKeyBrute, "AES");
+
+                    Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+                    cipher.init(Cipher.ENCRYPT_MODE, secretKey_,new GCMParameterSpec(128, iv));
+
+                    byte[] encryptedPdf = cipher.doFinal(fichierPdf);
+
+                    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                    outputStream.write(iv);           // 12 bytes
+                    outputStream.write(encryptedPdf);
+                    return outputStream.toByteArray();
+
+            }catch(Exception e){
+
+                throw new Exception ("PDF encryption failed" + e.getMessage());
+
+            }
+    }
+
+
+    public byte[] decryptPdf(Long idUser, byte [] fichierCrypte) throws Exception {
+
+        UtilisateurSecretDetailDto userSecretDetailDto = userSecretDetail(idUser);
+
+        try{
+            byte [] iv = generateIv();
+            byte [] secretKey = secretKeyGenerator(userSecretDetailDto.getPasswordHash() , userSecretDetailDto.getSalt());
+            byte [] masterKeyBrute = dechiffrageMasterKey(userSecretDetailDto.getMasterKey() , secretKey);
+            SecretKey secretKey_ = new SecretKeySpec(masterKeyBrute, "AES");
+
+            Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+            cipher.init(Cipher.DECRYPT_MODE, secretKey_,new GCMParameterSpec(128, iv));
+
+            byte[] decryptedPdf = cipher.doFinal(fichierCrypte);
+
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            outputStream.write(iv);           // 12 bytes
+            outputStream.write(decryptedPdf);
+            return outputStream.toByteArray();
+
+        }catch (Exception e){
+
+            throw new Exception ("Déchiffrage pdf annulé, une erreur est survenue  : " + e.getMessage());
+
+        }
+
+
     }
 }

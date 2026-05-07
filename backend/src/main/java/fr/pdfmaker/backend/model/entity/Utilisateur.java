@@ -3,13 +3,12 @@ package fr.pdfmaker.backend.model.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.Instant;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Table (name = "utilisateur")
@@ -21,7 +20,7 @@ import java.util.Set;
 @EqualsAndHashCode
 
 
-public class Utilisateur {
+public class Utilisateur implements UserDetails  {
 
     @Id
     @GeneratedValue (strategy = GenerationType.IDENTITY)
@@ -61,5 +60,21 @@ public class Utilisateur {
 
     @OneToMany(mappedBy = "utilisateur", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Fichier> fichiers = new HashSet<>();
+
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of();
+    }
+
+    @Override
+    public String getPassword() {
+        return passwordHash;
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
+    }
 }
 

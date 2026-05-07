@@ -1,6 +1,6 @@
 package fr.pdfmaker.backend.service.commun;
 
-public class VerifyFormatPdf {
+public class FormatVerification {
 
     public boolean verifyFormatPdf(byte [] fichierPdf) {
         byte[] pdfMagicBytes = { 0x25, 0x50, 0x44, 0x46 };
