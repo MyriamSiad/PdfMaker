@@ -7,7 +7,7 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "dev" : "tauri dev",
+    "dev": "tauri dev",
     "fresh": "rm node_modules package-lock.json && npm install && npm run dev"
   },
   "prettier": {
@@ -24,7 +24,6 @@
   },
   "private": true,
   "dependencies": {
-
     "@angular/animations": "^20.3.18",
     "@angular/cdk": "^20.2.14",
     "@angular/common": "^20.3.18",
@@ -41,6 +40,7 @@
     "@tauri-apps/api": "^2.10.1",
     "@tauri-apps/plugin-dialog": "^2.6.0",
     "@tauri-apps/plugin-fs": "^2.4.5",
+    "jwt-decode": "^4.0.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.15.0"

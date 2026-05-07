@@ -16,7 +16,9 @@ import {NgClass} from '@angular/common';
 export class HomeComponent {
 
   authService = inject(AuthService);
-  user = this.authService.currentUser;
+
+  prenom = this.authService.getPrenom();
+  nom = this.authService.getNom();
 
   stats = { conversions: 24, fusions: 8, separations: 3, annotations: 15 };
 
@@ -33,9 +35,7 @@ export class HomeComponent {
     return 'Bonsoir';
   }
 
-  getUserFirstName(): string {
-    return this.authService.currentUser()?.prenom ?? 'Utilisateur';
-  }
+
 
   getFormattedDate(): string {
     return new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });

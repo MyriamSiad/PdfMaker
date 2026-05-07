@@ -6,11 +6,21 @@ import {LoginRequest} from "@core/models/auth/login/login-request-model";
 import {ProfilResponse} from '@core/models/auth/login/profil-response.model';
 import {RegisterRequest} from '@core/models/auth/register/register-request.model';
 import {SIGNAL} from '@angular/core/primitives/signals';
+import { jwtDecode } from 'jwt-decode';
 
-
+interface JwtPayload {
+  sub: string;
+  iat: number;
+  exp: number;
+  prenom: string;
+  nom: string;
+  userId: number;
+}
 @Injectable({
   providedIn: 'root'
 })
+
+
 export class AuthService {
 
 
@@ -25,6 +35,32 @@ export class AuthService {
     this.loadUserFromStorage();
   }
 
+  getDecodedToken(): JwtPayload | null {
+    const stored = localStorage.getItem('user');
+    if (!stored) return null;
+
+    try {
+      const data = JSON.parse(stored);
+      return jwtDecode<JwtPayload>(data.accessToken);
+    } catch {
+      return null;
+    }
+  }
+
+  getEmail(): string | null {
+    return this.getDecodedToken()?.sub ?? null;
+  }
+  getPrenom(): string | null {
+    return this.getDecodedToken()?.prenom ?? null;
+  }
+
+  getNom(): string | null {
+    return this.getDecodedToken()?.nom ?? null;
+  }
+
+ getId() : number |null {
+    return this.getDecodedToken()?.userId ?? null;
+ }
   login(request: LoginRequest): Observable<ProfilResponse> {
     return this.http.post<ProfilResponse>(`${this.API_URL}/login`, request).pipe(
       tap(profil => {
@@ -61,7 +97,7 @@ export class AuthService {
 
   }
 
-  getProfil(): ProfilResponse | null {
-    return this.profilActif;
+  getProfil(): JwtPayload | null {
+    return this.getDecodedToken();
   }
 }

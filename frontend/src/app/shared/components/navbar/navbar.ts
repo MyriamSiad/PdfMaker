@@ -3,6 +3,7 @@ import {Router, RouterLink, RouterLinkActive} from '@angular/router';
 import {AuthService} from '@services/auth.service';
 import {ProfilResponse} from '@core/models/auth/login/profil-response.model';
 import {MatIcon} from '@angular/material/icon';
+import {JwtPayload} from 'jwt-decode';
 
 @Component({
   selector: 'app-navbar',
@@ -19,6 +20,10 @@ import {MatIcon} from '@angular/material/icon';
 export class Navbar {
 
   authService = inject(AuthService);
+
+  prenom = this.authService.getPrenom();
+  nom = this.authService.getNom();
+  email : string | null = this.authService.getEmail();
   router = inject(Router);
   isCollapsed = signal(false);
   @Output() collapsedChange = new EventEmitter<boolean>();
@@ -34,8 +39,8 @@ export class Navbar {
   }
 
   getUserInitials(): string  | null {
-    const user = this.authService.currentUser();
-    if(this.authService.currentUser() === null) return null;
+    const user = this.authService.getDecodedToken();
+    if(user === null) return null;
 
    // @ts-ignore
     const  initial_nom : string | undefined = user.nom?.charAt(0).toUpperCase() ?? ''
@@ -46,9 +51,9 @@ export class Navbar {
     // @ts-ignore
     return initial_nom + initial_prenom;
   }
-  getUserProfil(): ProfilResponse | null {
+  getUserProfil(): JwtPayload | null {
 
-    return this.authService.currentUser();
+    return this.authService.getProfil();
   }
 
 

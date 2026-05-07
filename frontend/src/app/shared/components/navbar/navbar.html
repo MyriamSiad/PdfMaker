@@ -112,8 +112,8 @@
         <span  class="text-white text-xs font-bold">{{ getUserInitials()}}</span>
       </div>
       <div class="flex-1 min-w-0">
-        <p [class.hidden]="isCollapsed()"  class="text-sm font-semibold text-gray-800 truncate">{{ getUserProfil()?.nom }} {{getUserProfil()?.prenom}}</p>
-        <p [class.hidden]="isCollapsed()"  class="text-xs text-gray-400 truncate">{{ getUserProfil()?.email }}</p>
+        <p [class.hidden]="isCollapsed()"  class="text-sm font-semibold text-gray-800 truncate">{{ nom }} {{prenom}}</p>
+        <p [class.hidden]="isCollapsed()"  class="text-xs text-gray-400 truncate">{{ email }}</p>
       </div>
     </div>
 
