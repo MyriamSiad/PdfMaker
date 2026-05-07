@@ -64,7 +64,6 @@ export class AuthService {
   login(request: LoginRequest): Observable<ProfilResponse> {
     return this.http.post<ProfilResponse>(`${this.API_URL}/login`, request).pipe(
       tap(profil => {
-        this.profilActif = profil;
         this.currentUser.set(profil);
         localStorage.setItem('user', JSON.stringify(profil));
       })

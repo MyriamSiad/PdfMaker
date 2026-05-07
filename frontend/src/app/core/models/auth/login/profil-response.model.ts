@@ -3,4 +3,5 @@ export interface ProfilResponse {
   nom: string;
   prenom: string;
   email: string;
+
 }
