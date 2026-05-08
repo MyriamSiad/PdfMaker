@@ -1,9 +1,11 @@
 package fr.pdfmaker.backend.service.coffrefort;
 
 import fr.pdfmaker.backend.model.dto.utilisateur.UtilisateurSecretDetailDto;
+import fr.pdfmaker.backend.model.entity.Utilisateur;
 import fr.pdfmaker.backend.repository.IUtilisateurRepository;
 import fr.pdfmaker.backend.service.commun.FormatVerification;
 import fr.pdfmaker.backend.utils.DtoUserConverter;
+import jdk.jshell.execution.Util;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
@@ -19,8 +21,10 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
+import java.util.Arrays;
 import java.util.HexFormat;
 
+import static java.util.Base64.getDecoder;
 import static java.util.Base64.getEncoder;
 
 
@@ -29,12 +33,12 @@ import static java.util.Base64.getEncoder;
 public class EncryptService {
 
     @Autowired
-    IUtilisateurRepository iUtilisateurRepository;
+    private IUtilisateurRepository iUtilisateurRepository;
 
     FormatVerification verifyFormat = new FormatVerification();
     public byte [] masterKeyGenerator( ) {
 
-        byte[] masterKeyBytes = new byte[32];
+        byte[] masterKeyBytes = new byte[16];
         SecureRandom random = new SecureRandom();
         random.nextBytes(masterKeyBytes);
         return masterKeyBytes;
@@ -44,23 +48,31 @@ public class EncryptService {
 
     /**
      * Cette méthode permet de chiffrer la masterKey avec le mot de passe de l'utilisateur et le salt, en utilisant l'algorithme PBKDF2WithHmacSHA256 pour dériver une clé secrète à partir du mot de passe et du salt, puis en utilisant cette clé secrète pour chiffrer la masterKey avec l'algorithme AES/GCM/PKCS5Padding. La masterKey chiffrée est ensuite encodée en Base64 pour être stockée dans la base de données.
-     * @param masterKey la clée masterKey est une clée de 256 bits (32 bytes) qui sera utilisée pour chiffrer et déchiffrer les fichiers PDF. Elle doit être générée de manière sécurisée et aléatoire, et doit être protégée contre tout accès non autorisé. La méthode masterKeyGenerator() génère une masterKey aléatoire de 256 bits en utilisant la classe SecureRandom de Java.
-     * @param password le password de l'utilisateur
-     * @param salt le salt est une valeur aléatoire qui est utilisée pour renforcer la sécurité du mot de passe hashé dans la base de données. Il est généralement généré de manière aléatoire pour chaque utilisateur et stocké dans la base de données avec le mot de passe hashé. La méthode saltGenerator() génère un salt aléatoire en utilisant la classe SecureRandom de Java, et le convertit en une chaîne hexadécimale pour le stockage dans la base de données.
+     * @param masterKey la clée masterKey est une clée de 256 bits (32 bytes) qui sera utilisée
+     *
      * @return String de la clée masterKey qui sera stockée en BDD
      */
     public  String chiffrageMasterKey (byte [] masterKey, byte[] secretKey) {
 
+
         try {
+            System.out.println("=== SECRET KEY CHIFFREMENT chiffrage master key  === " + Arrays.toString(secretKey));
+
+            byte[] iv = generateIv();
             Cipher cipher = Cipher.getInstance("AES/GCM/noPadding");
             SecretKeySpec secretKeySpec = new SecretKeySpec(secretKey, "AES");
-            cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
+            cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, new GCMParameterSpec(128, iv));
             byte [] encryptedMasterKey =  cipher.doFinal(masterKey);
-            return getEncoder().encodeToString(encryptedMasterKey);
+            byte[] ivPlusCipher = new byte[iv.length + encryptedMasterKey.length];
+            System.arraycopy(iv, 0, ivPlusCipher, 0, iv.length);
+            System.arraycopy(encryptedMasterKey, 0, ivPlusCipher, iv.length, encryptedMasterKey.length);
 
+            return getEncoder().encodeToString(ivPlusCipher);
         } catch (NoSuchAlgorithmException  e) {
             throw new RuntimeException("Erreur lors du chiffrage de la master key : " + e.getMessage());
         } catch (NoSuchPaddingException | IllegalBlockSizeException | BadPaddingException |InvalidKeyException e) {
+            throw new RuntimeException(e);
+        } catch (InvalidAlgorithmParameterException e) {
             throw new RuntimeException(e);
         }
 
@@ -73,39 +85,46 @@ public class EncryptService {
      * @return byte [] la clé secrète dérivée du mot de passe et du salt, qui sera utilisée pour chiffrer et déchiffrer la masterKey. Cette clé secrète est générée en utilisant l'algorithme PBKDF2WithHmacSHA256, qui est un algorithme de dérivation de clé sécurisé et largement utilisé. La méthode secretKeyGenerator() prend en entrée le mot de passe de l'utilisateur et le salt, et utilise ces deux éléments pour générer une clé secrète de 256 bits (32 bytes) qui sera utilisée pour chiffrer et déchiffrer la masterKey.
      */
     public byte [] secretKeyGenerator(String password, String salt) {
-        Pbkdf2PasswordEncoder.SecretKeyFactoryAlgorithm algorithmSha256 = Pbkdf2PasswordEncoder.SecretKeyFactoryAlgorithm.PBKDF2WithHmacSHA256;
-        PBEKeySpec spec = new PBEKeySpec(password.toCharArray(), salt.getBytes(), 65536, 256);
+
+        PBEKeySpec spec = new PBEKeySpec(password.toCharArray(), salt.getBytes(), 65536, 128);
 
         try {
-            byte[] secretKey = SecretKeyFactory.getInstance(algorithmSha256.toString()).generateSecret(spec).getEncoded();
-            return secretKey;
-        } catch (InvalidKeySpecException e) {
-            throw new RuntimeException(e);
-        } catch (NoSuchAlgorithmException e) {
+            SecretKeyFactory secretKey = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
+
+            System.out.println("=== SECRET KEY CHIFFREMENT generation === " + Arrays.toString(secretKey.generateSecret(spec).getEncoded()));
+            return secretKey.generateSecret(spec).getEncoded();
+
+        } catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
     }
 
     public byte [] generateIv(){
-        byte[] iv = new byte[16];
+        byte[] iv = new byte[12];
         SecureRandom random = new SecureRandom();
         random.nextBytes(iv);
         return iv;
     }
 
 
-    public byte [] dechiffrageMasterKey(String encryptedMasterKey, byte [] secretKey) {
+    public byte[] dechiffrageMasterKey(String encryptedMasterKey, byte[] secretKey) {
         try {
-            Cipher cipher = Cipher.getInstance("AES/GCM/noPadding");
+            System.out.println("=== SECRET KEY CHIFFREMENT  dans dechiffrage === " + Arrays.toString(secretKey));
+            byte[] ivPlusCipher = getDecoder().decode(encryptedMasterKey);
+
+            byte[] iv = Arrays.copyOfRange(ivPlusCipher, 0, 12);
+
+            byte[] encrypted = Arrays.copyOfRange(ivPlusCipher, 12, ivPlusCipher.length);
+
+            Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
             SecretKeySpec secretKeySpec = new SecretKeySpec(secretKey, "AES");
-            cipher.init(Cipher.DECRYPT_MODE, secretKeySpec);
-            byte [] decryptedMasterKey =  cipher.doFinal(getEncoder().encodeToString(encryptedMasterKey.getBytes()).getBytes());
-            return decryptedMasterKey;
+            cipher.init(Cipher.DECRYPT_MODE, secretKeySpec, new GCMParameterSpec(128, iv));
 
-        } catch (NoSuchPaddingException | IllegalBlockSizeException | BadPaddingException |InvalidKeyException  | NoSuchAlgorithmException  e) {
-            throw new RuntimeException(e);
+            return cipher.doFinal(encrypted); // ← retournera bien 16 bytes !
+
+        } catch (Exception e) {
+            throw new RuntimeException("Erreur déchiffrage master key : " + e.getMessage());
         }
-
     }
 
 
@@ -126,8 +145,14 @@ public class EncryptService {
             if (!iUtilisateurRepository.existsById(idUser)){
                 throw new IllegalArgumentException("Cet utilisateur n'existe pas !  ");
             }
-            DtoUserConverter converter = new DtoUserConverter();
-            return converter.convertUserToUserSecretDetailDto(iUtilisateurRepository.findByIdUser(idUser));
+            UtilisateurSecretDetailDto utilisateurSecretDetailDto = new UtilisateurSecretDetailDto();
+            Utilisateur user = iUtilisateurRepository.findByIdUser(idUser);
+            utilisateurSecretDetailDto.setIdUser(user.getIdUser());
+            utilisateurSecretDetailDto.setPasswordHash(user.getPasswordHash());
+            utilisateurSecretDetailDto.setSalt(user.getSalt());
+            utilisateurSecretDetailDto.setMasterKey(user.getMasterKey());
+
+            return  utilisateurSecretDetailDto;
         }catch (Exception e){
             throw new Exception("Erreur lors de la vérification de l'existence de l'utilisateur : " + e.getMessage());
         }
@@ -136,7 +161,7 @@ public class EncryptService {
     }
 
 
-   public byte [] encryptPdf( Long idUser, byte [] fichierPdf) throws Exception {
+   public byte [] encryptPdf( Long idUser, byte [] fichierPdf , String motDePasse) throws Exception {
 
             UtilisateurSecretDetailDto userSecretDetailDto = userSecretDetail(idUser);
             try{
@@ -144,11 +169,15 @@ public class EncryptService {
                     //throw new EncryptionException("Format pdf invalide ");
                 }
                     String masterKey= userSecretDetailDto.getMasterKey();
-                    byte [] secretKey =  secretKeyGenerator (userSecretDetailDto.getPasswordHash() , userSecretDetailDto.getSalt());
-                    byte [] iv = generateIv();
-                    byte [] masterKeyBrute = dechiffrageMasterKey(masterKey , secretKey);
-                    SecretKey secretKey_ = new SecretKeySpec(masterKeyBrute, "AES");
+                    byte [] secretKey =  secretKeyGenerator (motDePasse, userSecretDetailDto.getSalt());
 
+                    byte [] iv = generateIv();
+
+                System.out.println("=== SECRET KEY CHIFFREMENT === " + Arrays.toString(secretKey));
+                    byte [] masterKeyBrute = dechiffrageMasterKey(masterKey , secretKey);
+                    System.out.println("=== MASTER KEY LENGTH === " + masterKeyBrute.length);
+
+                    SecretKey secretKey_ = new SecretKeySpec(masterKeyBrute, "AES");
                     Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
                     cipher.init(Cipher.ENCRYPT_MODE, secretKey_,new GCMParameterSpec(128, iv));
 
@@ -169,10 +198,12 @@ public class EncryptService {
 
     public byte[] decryptPdf(Long idUser, byte [] fichierCrypte) throws Exception {
 
-        UtilisateurSecretDetailDto userSecretDetailDto = userSecretDetail(idUser);
 
         try{
+            UtilisateurSecretDetailDto userSecretDetailDto = userSecretDetail(idUser);
+
             byte [] iv = generateIv();
+
             byte [] secretKey = secretKeyGenerator(userSecretDetailDto.getPasswordHash() , userSecretDetailDto.getSalt());
             byte [] masterKeyBrute = dechiffrageMasterKey(userSecretDetailDto.getMasterKey() , secretKey);
             SecretKey secretKey_ = new SecretKeySpec(masterKeyBrute, "AES");

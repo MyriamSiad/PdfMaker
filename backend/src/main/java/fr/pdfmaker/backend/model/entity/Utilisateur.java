@@ -1,5 +1,6 @@
 package fr.pdfmaker.backend.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -14,7 +15,6 @@ import java.util.*;
 @Table (name = "utilisateur")
 @Getter
 @Setter
-@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
@@ -49,16 +49,20 @@ public class Utilisateur implements UserDetails  {
     @Column(name = "salt", length = 255, nullable = false)
     private String salt;
 
-    @OneToMany(mappedBy = "utilisateur", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    @OneToMany(fetch = FetchType.LAZY , mappedBy = "utilisateur", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Operation> operations = new HashSet<>();
 
-    @OneToMany(mappedBy = "utilisateur", cascade = CascadeType.ALL)
+    @JsonIgnore
+    @OneToMany( fetch = FetchType.LAZY , mappedBy = "utilisateur", cascade = CascadeType.ALL)
     private Set<CoffreAccessLog> accessLogs = new HashSet<>();
 
-    @OneToMany(mappedBy = "utilisateur", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    @OneToMany( fetch = FetchType.LAZY ,mappedBy = "utilisateur", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<DossierVirtuel> dossiers = new HashSet<>();
 
-    @OneToMany(mappedBy = "utilisateur", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    @OneToMany ( fetch = FetchType.LAZY , mappedBy = "utilisateur", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Fichier> fichiers = new HashSet<>();
 
 

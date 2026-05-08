@@ -4,7 +4,10 @@ import fr.pdfmaker.backend.model.dto.utilisateur.InscriptionRequestDto;
 import fr.pdfmaker.backend.model.dto.utilisateur.UtilisateurDto;
 import fr.pdfmaker.backend.model.dto.utilisateur.UtilisateurSecretDetailDto;
 import fr.pdfmaker.backend.model.entity.Utilisateur;
+import lombok.NoArgsConstructor;
 
+
+@NoArgsConstructor
 public final  class DtoUserConverter {
 
     /**

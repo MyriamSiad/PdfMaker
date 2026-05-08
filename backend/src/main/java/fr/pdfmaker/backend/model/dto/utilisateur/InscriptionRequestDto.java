@@ -16,8 +16,6 @@ import java.time.LocalDate;
 public class InscriptionRequestDto {
 
     private Long idUser;
-
-
     @ValidName
     private String nom;
     @ValidEmail

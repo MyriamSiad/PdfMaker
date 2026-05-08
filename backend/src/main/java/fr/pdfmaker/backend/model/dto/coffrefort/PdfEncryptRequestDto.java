@@ -18,6 +18,7 @@ public class PdfEncryptRequestDto {
 
     private String titre;
 
+    private String motDePasse;
    /* private String nomStockage;
 
     private String cheminLocal = "";*/

@@ -10,6 +10,7 @@ import fr.pdfmaker.backend.repository.IUtilisateurRepository;
 import fr.pdfmaker.backend.service.coffrefort.EncryptService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,11 +19,16 @@ import static fr.pdfmaker.backend.utils.DtoUserConverter.*;
 @Service
 public class UtilisateurService implements IUtilisateurService {
 
+
+
     @Autowired
     private IUtilisateurRepository utilisateurRepository;
 
     @Autowired
     private EncryptService encryptService;
+
+    @Autowired
+    private  PasswordEncoder passwordEncoder;
 
     @Override
     public UtilisateurDto getUtilsateur(long id) throws Exception {
@@ -98,8 +104,7 @@ public class UtilisateurService implements IUtilisateurService {
      * @author Myriam S.
      */
     private boolean verifyPassword(String rawPassword, String encodedPassword){
-        Argon2PasswordEncoder encoder = Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8();
-        return encoder.matches(rawPassword, encodedPassword);
+        return passwordEncoder.matches(rawPassword, encodedPassword);
     }
 
 
@@ -109,10 +114,11 @@ public class UtilisateurService implements IUtilisateurService {
     public Long createUser( InscriptionRequestDto user) throws Exception {
             verifyExistingUserEmail(user.getEmail());
             verifyUserInfo(user);
-            String passwordHash = hashPassword(user.getPasswordHash());
-            user.setPasswordHash(passwordHash);
+
+
             user.setSalt(encryptService.saltGenerator());
             String masterKey = encryptService.chiffrageMasterKey(encryptService.masterKeyGenerator(), encryptService.secretKeyGenerator(user.getPasswordHash(), user.getSalt()));
+             user.setPasswordHash(passwordEncoder.encode(user.getPasswordHash()));
             user.setMasterKey(masterKey);
             Utilisateur _user = convertUserDtoToUser(user);
 
@@ -144,13 +150,17 @@ public class UtilisateurService implements IUtilisateurService {
             if( login.getEmail() == null || login.getMotsDePasse() == null){
                 throw new IllegalArgumentException("Les données de connexion sont invalides ! ");
             }
-            Utilisateur user = utilisateurRepository.getUtilisateurByEmail(login.getEmail().trim());
+        Utilisateur user = utilisateurRepository.getUtilisateurByEmail(login.getEmail().trim());
             if(user == null){
                 throw new LoginIncorrectException("Login ou mot de passe incorrect. Veuillez réessayer.");
             }
             if(!verifyPassword(login.getMotsDePasse(), user.getPasswordHash())){
                 throw new LoginIncorrectException("Mots de passe incorrect ! ");
             }
+
+
+
+        //byte[] secretKey = encryptService.secretKeyGenerator(login.getMotsDePasse(), user.getSalt());
         return convertUserToUserDto(user);
     }
 }

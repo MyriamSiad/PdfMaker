@@ -17,24 +17,30 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @CrossOrigin (origins = "http://localhost:4200")
 @RequestMapping("/api/rest/coffre-fort")
 public class CoffreController {
 
 
-    private EncryptService  encryptCoffreService;
+    @Autowired
+    private  EncryptService  encryptCoffreService;
 
 
 
-
+    @PostMapping("/encrypt-file-test")
+    public ResponseEntity<Map<String, String>> testEndpoint() {
+        return ResponseEntity.ok(Map.of("status", "ok"));
+    }
 
 
     @PostMapping(value = "/encrypt-file" , consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<PdfEncryptResultDto> encryptFile (@ModelAttribute PdfEncryptRequestDto fichier , @AuthenticationPrincipal Utilisateur utilisateur) {
 
-
         if (fichier == null || fichier.getFichierPdf().isEmpty()|| fichier.getFichierPdf().getName().isBlank()) {
+
             return ResponseEntity.badRequest().build();
         }
 
@@ -42,15 +48,19 @@ public class CoffreController {
         try {
             PdfEncryptResultDto resultat = new PdfEncryptResultDto();
 
-            byte[] fileEncryptedBytes = encryptCoffreService.encryptPdf(utilisateur.getIdUser(), fichier.getFichierPdf().getBytes());
+            byte[] fileEncryptedBytes = encryptCoffreService.encryptPdf(utilisateur.getIdUser(), fichier.getFichierPdf().getBytes() , fichier.getMotDePasse());
 
-                resultat.setFichierPdf(fileEncryptedBytes);
-            return ResponseEntity.ok(resultat);
+            resultat.setFichierPdf(fileEncryptedBytes);
+
+            return ResponseEntity.ok()
+                    .header("Content-Disposition", "attachment; filename=fichier.enc")
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                    .body(resultat);
         } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("=== ERREUR === " + e.getMessage());
             return ResponseEntity.status(500).build();
         }
-
-
 
     }
 

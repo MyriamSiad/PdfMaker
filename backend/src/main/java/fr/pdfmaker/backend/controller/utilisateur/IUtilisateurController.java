@@ -1,5 +1,6 @@
 package fr.pdfmaker.backend.controller.utilisateur;
 
+import fr.pdfmaker.backend.model.dto.utilisateur.AuthResponseDto;
 import fr.pdfmaker.backend.model.dto.utilisateur.LoginDto;
 import fr.pdfmaker.backend.model.dto.utilisateur.InscriptionRequestDto;
 import fr.pdfmaker.backend.model.dto.utilisateur.UtilisateurDto;
@@ -19,7 +20,7 @@ public interface IUtilisateurController {
      * @param user Le DTO contenant les informations de l'utilisateur à créer.
      * @return L'ID de l'utilisateur créé.
      */
-    ResponseEntity<Long> createUtilisateur(InscriptionRequestDto user );
+    ResponseEntity<AuthResponseDto> createUtilisateur(InscriptionRequestDto user );
 
     /**
      * Met à jour les informations d'un utilisateur à partir d'un DTO d'utilisateur.
@@ -33,6 +34,6 @@ public interface IUtilisateurController {
      * @param login Le DTO contenant les informations de connexion de l'utilisateur. (Login, password)
      * @return Un DTO de l'utilisateur authentifié.
      */
-    ResponseEntity<UtilisateurDto> connexionUtilisateur(LoginDto login);
+    ResponseEntity<AuthResponseDto> connexionUtilisateur(LoginDto login);
 
 }

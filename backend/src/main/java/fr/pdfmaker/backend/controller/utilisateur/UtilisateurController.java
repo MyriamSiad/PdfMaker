@@ -1,17 +1,28 @@
 package fr.pdfmaker.backend.controller.utilisateur;
 
+import fr.pdfmaker.backend.model.dto.utilisateur.AuthResponseDto;
 import fr.pdfmaker.backend.model.dto.utilisateur.InscriptionRequestDto;
 import fr.pdfmaker.backend.model.dto.utilisateur.LoginDto;
 import fr.pdfmaker.backend.model.dto.utilisateur.UtilisateurDto;
+import fr.pdfmaker.backend.service.jwt.JwtService;
 import fr.pdfmaker.backend.service.utilisateur.IUtilisateurService;
+import fr.pdfmaker.backend.utils.DtoUserConverter;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.Produces;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.Consumes;
+
+import static fr.pdfmaker.backend.utils.DtoUserConverter.convertUserDtoToUser;
+import static fr.pdfmaker.backend.utils.DtoUserConverter.convertUserToUserDto;
 
 
 @RestController
@@ -22,21 +33,46 @@ public class UtilisateurController implements IUtilisateurController {
 
     @Autowired
     private IUtilisateurService userService;
+    @Autowired
+    private final JwtService jwtService;
+    @Autowired
+    private final AuthenticationManager authenticationManager;
+    @Autowired
+    private final UserDetailsService userDetailsService;
 
+
+    public UtilisateurController(JwtService jwtService, AuthenticationManager authenticationManager, UserDetailsService userDetailsService) {
+        this.jwtService = jwtService;
+        this.authenticationManager = authenticationManager;
+        this.userDetailsService = userDetailsService;
+    }
+
+
+    @Override
     public String getInfos() {
         return "";
     }
-
 
     @Override
     @PostMapping("/register")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public ResponseEntity<Long> createUtilisateur( @Valid @RequestBody InscriptionRequestDto user) {
+    public ResponseEntity<AuthResponseDto> createUtilisateur( @Valid @RequestBody InscriptionRequestDto user) {
 
         try{
            Long id =  userService.createUser(user);
-            return new ResponseEntity<>(id, HttpStatus.CREATED);
+            UserDetails userDetails = userDetailsService.loadUserByUsername(user.getEmail());
+
+
+            String accessToken = jwtService.generateToken(userDetails);
+            String refreshToken = jwtService.generateRefreshToken(userDetails);
+
+            AuthResponseDto authResponseDto = new AuthResponseDto();
+            authResponseDto.setAccessToken(accessToken);
+            authResponseDto.setRefreshToken(refreshToken);
+            //authResponseDto.setUtilisateur(userService.getUtilsateur(id));
+            return ResponseEntity.status(HttpStatus.CREATED).body(authResponseDto);
+
         }catch (Exception e ){
             e.printStackTrace();
             assert HttpStatus.resolve(409) != null;
@@ -65,15 +101,33 @@ public class UtilisateurController implements IUtilisateurController {
     @PostMapping("/login")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public ResponseEntity<UtilisateurDto> connexionUtilisateur( @RequestBody LoginDto user) {
+    public ResponseEntity<AuthResponseDto> connexionUtilisateur(@RequestBody LoginDto user) {
 
         try{
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            user.getEmail(),
+                            user.getMotsDePasse()
+                    )
+            );
             UtilisateurDto userDto =  userService.loginUser(user);
-            return new ResponseEntity(userDto, HttpStatus.OK);
+            UserDetails userDetails = userDetailsService.loadUserByUsername(user.getEmail());
+            String accessToken = jwtService.generateToken(userDetails, userDto);
+            //String accessToken = jwtService.generateToken(userDetails);
+            String refreshToken = jwtService.generateRefreshToken(userDetails);
+
+            AuthResponseDto authResponseDto = new AuthResponseDto();
+            authResponseDto.setAccessToken(accessToken);
+            authResponseDto.setRefreshToken(refreshToken);
+            //authResponseDto.setUtilisateur(userDto);
+            return ResponseEntity.ok(authResponseDto);
+
+        } catch (BadCredentialsException e) {
+            // Email ou mot de passe incorrect
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } catch (Exception e) {
             e.printStackTrace();
-            return new ResponseEntity<>(HttpStatus.resolve(401));
-
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
 
     }

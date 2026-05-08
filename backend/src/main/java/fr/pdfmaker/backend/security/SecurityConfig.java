@@ -1,23 +1,36 @@
 package fr.pdfmaker.backend.security;
 
 
+import fr.pdfmaker.backend.service.jwt.JwtAuthenticationFilter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
 import java.util.List;
 
-@Configuration
 
+@Configuration
+@EnableWebSecurity
+@RequiredArgsConstructor
 /**
  * Configuration de sécurité pour l'application. Cette classe configure les règles de sécurité pour les requêtes HTTP.
  * Actuellement, elle désactive la protection CSRF et permet toutes les requêtes sans authentification. Cela peut être ajusté en fonction des besoins de sécurité de l'application.
  */
 public class SecurityConfig {
+
+    private final JwtAuthenticationFilter jwtAuthFilter;
+    private final AuthenticationProvider authenticationProvider;
+
+
+
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -25,15 +38,18 @@ public class SecurityConfig {
 
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
-
                 .csrf(csrf -> csrf.disable())
-
                 .formLogin(form -> form.disable())  // ← ajoute ça
                 .httpBasic(basic -> basic.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/rest/user/login", "/api/rest/user/register",  "/api/rest/pdf/conversion/**").permitAll() // routes publiques
+                        .requestMatchers("/api/rest/user/login", "/api/rest/user/register").permitAll() // routes publiques
                         .anyRequest().authenticated()                        // tout le reste → authentifié
-                );
+                )  .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
+                .authenticationProvider(authenticationProvider)
+                .addFilterBefore(jwtAuthFilter,  UsernamePasswordAuthenticationFilter.class);
+
 
         return http.build();
     }
@@ -51,5 +67,8 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", config);  // appliqué à toutes les routes
         return source;
     }
+
+
+
 }
 
