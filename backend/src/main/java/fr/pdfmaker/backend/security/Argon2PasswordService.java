@@ -1,6 +1,8 @@
 package fr.pdfmaker.backend.security;
 
+import lombok.Getter;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
+import org.springframework.stereotype.Service;
 
 
 /**
@@ -10,6 +12,8 @@ import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
  * @Author  : Myriam Siad
  * */
 
+@Service
+@Getter
 public class Argon2PasswordService implements IPasswordService{
 
     private final  Argon2PasswordEncoder encoder ;

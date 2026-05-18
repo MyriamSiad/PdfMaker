@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Decrypt</title>
+</head>
+<body>
+
+  <h1>Déchiffrer un fichier</h1>
+
+  <form (submit)="onSubmit()">
+
+    <div class="form-group">
+      <label for="fichierChiffre">Fichier à déchiffrer</label>
+      <input
+        type="file"
+        id="fichierChiffre"
+        (change)="onFichierChange($event)"
+        required
+      />
+      @if(fichierSelectionne) {
+      <span class="fichier-nom">
+        📄 {{ fichierSelectionne?.name }}
+      </span>
+      }
+    </div>
+
+    <!-- Nom du fichier de sortie -->
+    <!--  <div class="form-group">
+        <label for="nomFichierSortie">Nom du fichier de sortie</label>
+        <input
+          type="text"
+          id="nomFichierSortie"
+          [(ngModel)]="nomFichierSortie"
+          name="nomFichierSortie"
+          placeholder="ex: mon_fichier_dechiffre"
+          required
+        /
+       </div>>-->
+
+      <div class="form-group">
+        <label for="motDePasse">Mot de passe</label>
+        <input
+          type="password"
+          id="motDePasse"
+          [(ngModel)]="motDePasse"
+          name="motDePasse"
+          placeholder="ex: mots de passe"
+          required
+        />
+      </div>
+
+      <button type="submit" [disabled] ="!fichierSelectionne  || chargement">
+        @if (!chargement) {
+          <span >🔒 Déchiffrer</span>
+        }
+
+        @if (chargement) {
+          <span >Déchiffrement en cours...</span>
+        }
+      </button>
+
+      </form>
+    @if (resultat) {
+      <ngx-extended-pdf-viewer
+        [src]="resultat"
+        [showToolbar]="true"
+        [showSidebarButton]="false"
+        height="800px"
+        (pdfLoadingFailed)="erreur = 'Erreur chargement PDF'">
+      </ngx-extended-pdf-viewer>
+      <button (click)="fermerVisionneuse()">❌ Fermer</button>
+    }
+      @if (erreur) {
+        <div class="erreur">
+          ❌ {{ erreur }}
+        </div>
+      }
+
+
+  </body>
+  </html>

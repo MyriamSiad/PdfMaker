@@ -16,13 +16,26 @@ import {HomeComponent} from '@features/home/home.component';
 
        { path: 'txt-to-pdf',
     loadComponent: () => import('@features/conversion/conversion.txt.component').then(m => m.TxtToPdfComponent)
-},
+      },
        { path: 'img-to-pdf',
          loadComponent: () => import('@features/conversion/image-conversion').then(m => m.ImageToPdfComponent)
        },
        { path : 'convert',
          loadComponent : () => import ('@features/conversion/conversion.component').then(m => m.ConversionComponent)
+       },
+
+       /*{ path : 'coffre-fort',
+         loadComponent : () => import ('@features/coffre-fort/coffre-fort-component').then(m => m.ConversionComponent)
+       }*/
+
+       { path : 'coffre-fort/encrypt',
+       loadComponent : () => import ('@features/coffre-fort/encrypt/encrypt-component').then(m => m.EncryptComponent)
+     },
+       { path : 'coffre-fort/decrypt',
+         loadComponent : () => import ('@features/coffre-fort/decrypt/decrypt-component').then(m => m.DecryptComponent)
        }
+
+
      ]
    },
    {

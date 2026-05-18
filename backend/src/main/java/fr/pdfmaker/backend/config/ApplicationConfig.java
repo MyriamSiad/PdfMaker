@@ -1,5 +1,6 @@
 package fr.pdfmaker.backend.config;
 import fr.pdfmaker.backend.repository.IUtilisateurRepository;
+import fr.pdfmaker.backend.security.Argon2PasswordService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -45,11 +46,11 @@ public class ApplicationConfig {
         return config.getAuthenticationManager();
     }
 
-    // ──────────────────────────────────────────────
-    // PasswordEncoder
-    // ──────────────────────────────────────────────
+
+    private final Argon2PasswordService argon2PasswordService;
+
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+        return argon2PasswordService.getEncoder();
     }
 }

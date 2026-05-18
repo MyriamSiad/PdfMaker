@@ -118,7 +118,7 @@ public class UtilisateurService implements IUtilisateurService {
 
             user.setSalt(encryptService.saltGenerator());
             String masterKey = encryptService.chiffrageMasterKey(encryptService.masterKeyGenerator(), encryptService.secretKeyGenerator(user.getPasswordHash(), user.getSalt()));
-             user.setPasswordHash(passwordEncoder.encode(user.getPasswordHash()));
+            user.setPasswordHash(passwordEncoder.encode(user.getPasswordHash()));
             user.setMasterKey(masterKey);
             Utilisateur _user = convertUserDtoToUser(user);
 

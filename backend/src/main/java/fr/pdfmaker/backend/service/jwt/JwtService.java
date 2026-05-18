@@ -78,11 +78,11 @@ public class JwtService {
     ) {
         // ✅ Jwts.builder() — API 0.12.x, signWith(SecretKey) sans préciser l'algo (auto-détecté)
         return Jwts.builder()
-                .claims(extraClaims)                          // ✅ claims() remplace setClaims()
-                .subject(userDetails.getUsername())           // ✅ subject() remplace setSubject()
-                .issuedAt(new Date(System.currentTimeMillis()))   // ✅ issuedAt() remplace setIssuedAt()
-                .expiration(new Date(System.currentTimeMillis() + expiration)) // ✅ expiration() remplace setExpiration()
-                .signWith(getSigningKey())                    // ✅ auto-détecte HS256/HS384/HS512
+                .claims(extraClaims)
+                .subject(userDetails.getUsername())
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + expiration))
+                .signWith(getSigningKey())
                 .compact();
     }
 

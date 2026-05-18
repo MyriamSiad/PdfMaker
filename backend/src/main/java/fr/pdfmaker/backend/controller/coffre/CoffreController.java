@@ -6,6 +6,7 @@ import fr.pdfmaker.backend.model.dto.coffrefort.PdfEncryptResultDto;
 import fr.pdfmaker.backend.model.dto.conversion.ConversionResultatDto;
 import fr.pdfmaker.backend.model.dto.conversion.TxtConversionRequestDto;
 import fr.pdfmaker.backend.model.dto.utilisateur.UtilisateurDto;
+import fr.pdfmaker.backend.model.dto.utilisateur.UtilisateurSecretDetailDto;
 import fr.pdfmaker.backend.model.entity.Utilisateur;
 import fr.pdfmaker.backend.service.coffrefort.CoffreFortService;
 import fr.pdfmaker.backend.service.coffrefort.EncryptService;
@@ -36,10 +37,23 @@ public class CoffreController {
     }
 
 
-    @PostMapping(value = "/encrypt-file" , consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<PdfEncryptResultDto> encryptFile (@ModelAttribute PdfEncryptRequestDto fichier , @AuthenticationPrincipal Utilisateur utilisateur) {
+    @GetMapping("/secrets/{idUser}")
+    public ResponseEntity<UtilisateurSecretDetailDto> getSecrets(@PathVariable Long idUser) throws Exception {
 
-        if (fichier == null || fichier.getFichierPdf().isEmpty()|| fichier.getFichierPdf().getName().isBlank()) {
+        try {
+            return ResponseEntity.ok(encryptCoffreService.userSecretDetail(idUser));
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("=== ERREUR === " + e.getMessage());
+            return ResponseEntity.status(500).build();
+        }
+
+
+    }
+    @PostMapping(value = "/encrypt-file" , consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<byte []> encryptFile (@ModelAttribute PdfEncryptRequestDto fichier , @AuthenticationPrincipal Utilisateur utilisateur) {
+
+        if (fichier == null || fichier.getFichierPdf()  == null || fichier.getFichierPdf().isEmpty()|| fichier.getFichierPdf().getName().isBlank()) {
 
             return ResponseEntity.badRequest().build();
         }
@@ -55,7 +69,7 @@ public class CoffreController {
             return ResponseEntity.ok()
                     .header("Content-Disposition", "attachment; filename=fichier.enc")
                     .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                    .body(resultat);
+                    .body(resultat.getFichierPdf());
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("=== ERREUR === " + e.getMessage());

@@ -104,12 +104,7 @@ public class UtilisateurController implements IUtilisateurController {
     public ResponseEntity<AuthResponseDto> connexionUtilisateur(@RequestBody LoginDto user) {
 
         try{
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            user.getEmail(),
-                            user.getMotsDePasse()
-                    )
-            );
+
             UtilisateurDto userDto =  userService.loginUser(user);
             UserDetails userDetails = userDetailsService.loadUserByUsername(user.getEmail());
             String accessToken = jwtService.generateToken(userDetails, userDto);
@@ -119,6 +114,13 @@ public class UtilisateurController implements IUtilisateurController {
             AuthResponseDto authResponseDto = new AuthResponseDto();
             authResponseDto.setAccessToken(accessToken);
             authResponseDto.setRefreshToken(refreshToken);
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            user.getEmail(),
+                            user.getMotsDePasse()
+                    )
+            );
+
             //authResponseDto.setUtilisateur(userDto);
             return ResponseEntity.ok(authResponseDto);
 

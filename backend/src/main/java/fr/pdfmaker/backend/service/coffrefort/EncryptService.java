@@ -148,7 +148,6 @@ public class EncryptService {
             UtilisateurSecretDetailDto utilisateurSecretDetailDto = new UtilisateurSecretDetailDto();
             Utilisateur user = iUtilisateurRepository.findByIdUser(idUser);
             utilisateurSecretDetailDto.setIdUser(user.getIdUser());
-            utilisateurSecretDetailDto.setPasswordHash(user.getPasswordHash());
             utilisateurSecretDetailDto.setSalt(user.getSalt());
             utilisateurSecretDetailDto.setMasterKey(user.getMasterKey());
 
@@ -163,7 +162,7 @@ public class EncryptService {
 
    public byte [] encryptPdf( Long idUser, byte [] fichierPdf , String motDePasse) throws Exception {
 
-            UtilisateurSecretDetailDto userSecretDetailDto = userSecretDetail(idUser);
+         UtilisateurSecretDetailDto userSecretDetailDto = userSecretDetail(idUser);
             try{
                 if (!verifyFormat.verifyFormatPdf(fichierPdf)) {
                     //throw new EncryptionException("Format pdf invalide ");
