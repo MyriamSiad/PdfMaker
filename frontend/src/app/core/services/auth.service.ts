@@ -36,7 +36,7 @@ export class AuthService {
   }
 
   getDecodedToken(): JwtPayload | null {
-    const stored = localStorage.getItem('user');
+    const stored = sessionStorage.getItem('user');
     if (!stored) return null;
 
     try {
@@ -65,7 +65,8 @@ export class AuthService {
     return this.http.post<ProfilResponse>(`${this.API_URL}/login`, request).pipe(
       tap(profil => {
         this.currentUser.set(profil);
-        localStorage.setItem('user', JSON.stringify(profil));
+        sessionStorage.setItem('user', JSON.stringify(profil));
+       // localStorage.setItem('user', JSON.stringify(profil));
       })
     );
   }
@@ -80,12 +81,12 @@ export class AuthService {
 
   logout(): void {
     this.currentUser.set(null);
-    localStorage.removeItem('user');
+    sessionStorage.removeItem('user');
   }
 
 
   loadUserFromStorage() {
-    const stored = localStorage.getItem('user');
+    const stored = sessionStorage.getItem('user');
     if (stored) {
       this.currentUser.set(JSON.parse(stored));
     }
