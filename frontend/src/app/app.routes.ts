@@ -32,7 +32,16 @@ import {PdfViewerComponent} from '@features/pdf-viewer/pdf-viewer.component';
 
        { path :'viewer/:idFichier',
          loadComponent : () => import ('@features/pdf-viewer/pdf-viewer.component').then(m => m.PdfViewerComponent)
+       },
+
+       { path :'merge-pdf',
+         loadComponent : () => import ('@features/fusion/fusion.component').then(m => m.FusionComponent)
+       },
+
+       { path :'split-pdf',
+         loadComponent : () => import ('@features/separation/separation.component').then(m => m.SeparationComponent)
        }
+
 
 
      ]

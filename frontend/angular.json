@@ -20,9 +20,9 @@
             "tsConfig": "tsconfig.app.json",
             "assets": [
               {
-                "glob": "**/*",
-                "input": "node_modules/ngx-extended-pdf-viewer/assets/",
-                "output": "/assets/"
+                "glob": "pdf.worker.min.mjs",
+                "input": "node_modules/pdfjs-dist/build/",
+                "output": "assets"
               }
             ],
             "styles": [
@@ -46,6 +46,7 @@
               ],
               "outputHashing": "all"
             },
+
             "development": {
               "optimization": false,
               "extractLicenses": false,
@@ -78,9 +79,13 @@
             ],
             "tsConfig": "tsconfig.spec.json",
             "assets": [
+              "src/favicon.ico",
+              "src/assets",
               {
-                "glob": "**/*",
-                "input": "public"
+
+                "glob": "pdf.worker.min.js",
+                "input": "node_modules/pdfjs-dist/build/",
+                "output": "assets"
               }
             ],
             "styles": [

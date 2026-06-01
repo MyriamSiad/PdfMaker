@@ -1,0 +1,112 @@
+import { Component } from '@angular/core';
+import * as pdfjsLib from 'pdfjs-dist';
+import { PdfToolsService } from '@services/pdf-tools.service';
+import {FormsModule} from '@angular/forms';
+pdfjsLib.GlobalWorkerOptions.workerSrc = './assets/pdf.worker.min.mjs';
+
+interface PageThumbnail {
+  pageNumber: number;
+  dataUrl: string;
+  selected: boolean;
+}
+
+@Component({
+  selector: 'app-split-pdf',
+  imports: [
+    FormsModule
+  ],
+  templateUrl: './separation.component.html'
+})
+export class SeparationComponent {
+  splitFile: File | null = null;
+  isDragOver = false;
+  splitting = false;
+  pages: PageThumbnail[] = [];
+  outputName = 'selection.pdf';
+
+  constructor(private pdfToolsService: PdfToolsService) {}
+
+  async onSplitFileSelected(event: Event): Promise<void> {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+    this.splitFile = file;
+    await this.generateThumbnails(file);
+  }
+
+  async onDropSplit(event: DragEvent): Promise<void> {
+    event.preventDefault();
+    this.isDragOver = false;
+    const file = event.dataTransfer?.files?.[0];
+    if (file?.type === 'application/pdf') {
+      this.splitFile = file;
+      await this.generateThumbnails(file);
+    }
+  }
+
+  async generateThumbnails(file: File): Promise<void> {
+    this.pages = [];
+    const arrayBuffer = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i);
+      const viewport = page.getViewport({ scale: 0.4 });
+
+      const canvas = document.createElement('canvas');
+      canvas.width = viewport.width;
+      canvas.height = viewport.height;
+
+      await page.render({
+        canvasContext: canvas.getContext('2d')!,
+        viewport,
+        canvas: canvas
+      }).promise;
+
+      this.pages.push({
+        pageNumber: i,
+        dataUrl: canvas.toDataURL(),
+        selected: false
+      });
+    }
+  }
+
+  togglePage(page: PageThumbnail): void {
+    page.selected = !page.selected;
+  }
+
+  selectAll(): void {
+    this.pages.forEach(p => p.selected = true);
+  }
+
+  deselectAll(): void {
+    this.pages.forEach(p => p.selected = false);
+  }
+
+  get selectedCount(): number {
+    return this.pages.filter(p => p.selected).length;
+  }
+
+  async onExtract(): Promise<void> {
+    if (!this.splitFile) return;
+    this.splitting = true;
+
+    const selectedPages = this.pages
+      .filter(p => p.selected)
+      .map(p => ({ start: p.pageNumber, end: p.pageNumber, nom: '' }));
+
+    const results = await this.pdfToolsService.splitPdf(this.splitFile, selectedPages);
+
+
+    const merged = await this.pdfToolsService.mergePdfs(
+
+      results.map(r => new File ([r.bytes as BlobPart], r.nom, { type: 'application/pdf' }))
+    );
+    this.pdfToolsService.download(merged, this.outputName || 'selection.pdf');
+    this.splitting = false;
+  }
+
+  onDragOver(event: DragEvent): void {
+    event.preventDefault();
+    this.isDragOver = true;
+  }
+}

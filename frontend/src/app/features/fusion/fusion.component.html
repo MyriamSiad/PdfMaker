@@ -1,0 +1,100 @@
+<h2 class="sr-only">Fusionner des fichiers PDF</h2>
+
+<div class="p-8 max-w-2xl mx-auto flex flex-col gap-6">
+
+  <!-- Zone drop -->
+  <div
+    (dragover)="onDragOver($event)"
+    (dragleave)="isDragOver = false"
+    (drop)="onDrop($event)"
+    (click)="mergeInput.click()"
+    [class.border-amber-500]="isDragOver"
+    class="border-2 border-dashed border-[#2a3040] rounded-xl p-16 text-center
+           cursor-pointer transition-colors hover:border-amber-700/40 hover:bg-amber-700/[.03]">
+    <i class="ti ti-file-plus text-4xl text-gray-500" aria-hidden="true"></i>
+    <p class="mt-3 mb-1 text-sm text-[#e8e0d0]">Glissez vos PDFs ici</p>
+    <p class="text-xs text-gray-500">ou cliquez pour parcourir</p>
+    <input #mergeInput type="file" accept=".pdf" multiple (change)="onFilesSelected($event)" class="hidden"/>
+  </div>
+
+  <!-- Liste des fichiers -->
+  @if (mergeFiles.length > 0) {
+    <div class="flex flex-col gap-3">
+      <p class="text-xs text-gray-500 m-0">
+        <i class="ti ti-sort-ascending" aria-hidden="true"></i>
+        Ordre de fusion — utilise les flèches pour réordonner
+      </p>
+
+      @for (file of mergeFiles; track file.name; let i = $index) {
+        <div class="flex flex-col bg-[#141820] border border-[#2a3040] rounded-xl overflow-hidden">
+
+          <!-- Ligne fichier -->
+          <div class="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-white/[.02] transition-colors"
+               (click)="togglePreview(i)">
+            <span class="text-xs text-gray-500 min-w-[20px]">{{ i + 1 }}</span>
+            <i class="ti ti-file-type-pdf text-lg text-gray-400" aria-hidden="true"></i>
+            <span class="flex-1 text-sm text-[#e8e0d0] truncate">{{ file.name }}</span>
+            <span class="text-xs text-gray-500 shrink-0">{{ (file.size / 1024).toFixed(0) }} Ko</span>
+
+            <!-- Icône accordéon -->
+            <i class="ti text-base text-gray-500 transition-transform"
+               [class.ti-chevron-up]="previewIndex === i"
+               [class.ti-chevron-down]="previewIndex !== i"
+               aria-hidden="true"></i>
+
+            <button (click)="moveUp(i); $event.stopPropagation()" [disabled]="i === 0"
+                    class="p-1 text-gray-500 hover:text-[#e8e0d0] disabled:opacity-20
+                           bg-transparent border-none cursor-pointer transition-colors">
+              <i class="ti ti-chevron-up text-base" aria-hidden="true"></i>
+            </button>
+            <button (click)="moveDown(i); $event.stopPropagation()" [disabled]="i === mergeFiles.length - 1"
+                    class="p-1 text-gray-500 hover:text-[#e8e0d0] disabled:opacity-20
+                           bg-transparent border-none cursor-pointer transition-colors">
+              <i class="ti ti-chevron-down text-base" aria-hidden="true"></i>
+            </button>
+            <button (click)="removeFile(i); $event.stopPropagation()"
+                    class="p-1 text-red-400/60 hover:text-red-400 bg-transparent border-none cursor-pointer transition-colors">
+              <i class="ti ti-trash text-base" aria-hidden="true"></i>
+            </button>
+          </div>
+
+          <!-- Aperçu accordéon -->
+          @if (previewIndex === i) {
+            <div class="border-t border-[#2a3040]">
+              <ngx-extended-pdf-viewer
+                [src]="file"
+                [showToolbar]="false"
+                [showSidebarButton]="false"
+                height="400px">
+              </ngx-extended-pdf-viewer>
+            </div>
+          }
+
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Nom du fichier résultat -->
+  @if (mergeFiles.length > 1) {
+    <div class="flex items-center gap-3">
+      <label class="text-xs text-gray-500 whitespace-nowrap">Nom du fichier :</label>
+      <input [(ngModel)]="mergeOutputName" placeholder="fusion.pdf"
+             class="flex-1 px-3 py-2 text-sm bg-[#0c0f14] border border-[#2a3040]
+                    rounded-lg text-[#e8e0d0] outline-none focus:border-amber-700/50
+                    placeholder-[#3a4255] font-mono"/>
+    </div>
+  }
+
+  <!-- Bouton fusionner -->
+  @if (mergeFiles.length > 1) {
+    <button (click)="onMerge()" [disabled]="merging"
+            class="flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-medium
+                   bg-amber-700 hover:bg-amber-600 text-[#0c0f14] transition-colors
+                   disabled:opacity-40 disabled:cursor-not-allowed">
+      <i class="ti ti-git-merge" aria-hidden="true"></i>
+      {{ merging ? 'Fusion en cours...' : 'Fusionner les PDFs' }}
+    </button>
+  }
+
+</div>
