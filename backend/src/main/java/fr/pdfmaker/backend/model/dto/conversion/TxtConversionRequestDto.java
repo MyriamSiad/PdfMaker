@@ -13,4 +13,6 @@ public class TxtConversionRequestDto extends ConversionRequestDto {
     @NotBlank(message = "Le nom du fichier de sortie est obligatoire")
     private String nomFichierSortie;
 
+
+
 }

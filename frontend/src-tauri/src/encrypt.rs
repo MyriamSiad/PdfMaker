@@ -1,4 +1,4 @@
-
+/*
 use aes_gcm::{
   aead::{Aead, KeyInit},
   Aes128Gcm, Key, Nonce,
@@ -7,17 +7,14 @@ use base64::{engine::general_purpose, Engine};
 use pbkdf2::pbkdf2_hmac;
 use rand::{rngs::OsRng, RngCore};
 use sha2::Sha256;
-use zeroize::Zeroize;
+use zeroize::{Zeroize, Zeroizing};
 
+use std::sync::{Arc, Mutex};
+*/
 
-fn derive_secret_key(password: &str, salt: &str) -> Result<Vec<u8>, String> {
+/*fn derive_secret_key(password: &str, salt: &str) -> Result<Vec<u8>, String> {
   let mut key = vec![0u8; 16];
-  pbkdf2_hmac::<Sha256>(
-    password.as_bytes(),
-    salt.as_bytes(),
-    65536,
-    &mut key,
-  );
+  pbkdf2_hmac::<Sha256>(password.as_bytes(), salt.as_bytes(), 600_000, &mut key);
   Ok(key)
 }
 
@@ -52,7 +49,6 @@ fn encrypt_with_master_key(data: &[u8], master_key: &[u8]) -> Result<Vec<u8>, St
   let cipher = Aes128Gcm::new(key);
   let nonce = Nonce::from_slice(&iv);
 
-  println!("=== IV CHIFFREMENT : {:?}", &iv);
   let encrypted = cipher
     .encrypt(nonce, data)
     .map_err(|e| format!("Erreur chiffrement PDF : {}", e))?;
@@ -83,52 +79,6 @@ fn decrypt_with_master_key(data: &[u8], master_key: &[u8]) -> Result<Vec<u8>, St
     .map_err(|_| "Déchiffrement PDF échoué, fichier corrompu ou clé incorrecte".to_string())
 }
 
-
-/*#[tauri::command]
-pub fn encrypt_pdf(
-  password: String,
-  salt: String,
-  encrypted_master_key: String,
-  pdf_bytes: Vec<u8>,
-) -> Result<Vec<u8>, String> {
-  // Dériver la Clé B
-  let mut secret_key = derive_secret_key(&password, &salt)?;
-
-  // Déchiffrer la MasterKey — si le mot de passe est faux, on s'arrête ici
-  let mut master_key = decrypt_master_key(&encrypted_master_key, &secret_key)?;
-
-  // Chiffrer le PDF
-  let result = encrypt_with_master_key(&pdf_bytes, &master_key);
-
-  // Effacer les secrets de la RAM immédiatement (Rust garantit l'exécution ici)
-  secret_key.zeroize();
-  master_key.zeroize();
-
-  result
-}*/
-
-/*#[tauri::command]
-pub fn decrypt_pdf(
-  password: String,
-  salt: String,
-  encrypted_master_key: String,
-  encrypted_pdf: Vec<u8>,
-) -> Result<Vec<u8>, String> {
-  let mut secret_key = derive_secret_key(&password, &salt)?;
-  let mut master_key = decrypt_master_key(&encrypted_master_key, &secret_key)?;
-
-  println!("=== encrypted_pdf length : {}", encrypted_pdf.len());
-  println!("=== secret_key length : {}", secret_key.len());
-  println!("=== master_key length : {}", master_key.len());
-  println!("=== IV extrait : {:?}", &encrypted_pdf[..12]);
-
-  let result = decrypt_with_master_key(&encrypted_pdf, &master_key);
-
-  secret_key.zeroize();
-  master_key.zeroize();
-
-  result
-}*/
 
 
 #[tauri::command]
@@ -172,3 +122,77 @@ pub fn decrypt_pdf(
 
   result.map(|bytes| general_purpose::STANDARD.encode(&bytes))
 }
+
+
+
+
+pub struct VaultState {
+  pub key: Arc<Mutex<Option<Zeroizing<[u8; 16]>>>>
+}
+
+
+
+// Commande d'ouverture
+#[tauri::command]
+pub fn unlock_vault(
+  password: String,
+  salt: String,
+  encrypted_master_key: String,
+  state: tauri::State<'_, VaultState>
+) -> Result<String, String> {
+
+  let mut  secret_key = derive_secret_key(&password, &salt)?;
+
+  //let mut lock = state.key.lock().unwrap();
+
+  let master_key_vec = decrypt_master_key(&encrypted_master_key, &secret_key)?;
+
+  secret_key.zeroize();
+
+
+  let mut key_array = [0u8; 16];
+  key_array.copy_from_slice(&master_key_vec[..16]);
+
+
+  let mut lock = state.key.lock().unwrap();
+  *lock = Some(Zeroizing::new(key_array));
+
+  Ok("unlocked".to_string())
+}
+
+
+
+#[tauri::command]
+pub fn read_file(
+  chemin: String,
+  iv : String,
+  state: tauri::State<'_, VaultState>
+) -> Result<Vec<u8>, String> {
+
+
+  let key_copy: [u8; 16] = {
+    let lock = state.key.lock().unwrap();
+    let key = lock.as_ref().ok_or("Coffre verrouillé")?;
+    **key
+  };
+
+  use base64::{Engine as _, engine::general_purpose};
+  let iv = general_purpose::STANDARD
+    .decode(&iv)
+    .map_err(|e| format!("IV invalide : {}", e))?;
+
+  let encrypted_bytes = std::fs::read(&chemin)
+    .map_err(|e| format!("Lecture fichier échouée : {}", e))?;
+
+  decrypt_with_master_key(&encrypted_bytes, &key_copy)
+}
+
+#[tauri::command]
+pub fn lock_vault(state: tauri::State<'_, VaultState>) -> Result<(), String> {
+  let mut lock = state.key.lock().unwrap();
+  *lock = None;
+  Ok(())
+}
+
+
+ */

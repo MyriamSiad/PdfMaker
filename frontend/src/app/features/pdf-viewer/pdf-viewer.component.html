@@ -1,0 +1,48 @@
+<div class="min-h-screen bg-[#0c0f14] flex flex-col">
+
+  <!-- Header -->
+  <div class="flex items-center gap-3 px-5 py-3 border-b border-[#1e2535]">
+    <button (click)="retour()"
+            class="text-sm text-gray-400 hover:text-amber-600 transition-colors">
+      ← Retour
+    </button>
+    <span class="text-[#e8e0d0] text-sm font-mono">Visionneuse PDF</span>
+  </div>
+
+  <!-- Contenu -->
+  @if (loading) {
+    <div class="flex-1 flex items-center justify-center">
+      <p class="text-gray-500 font-mono text-sm animate-pulse">Déchiffrement en cours...</p>
+    </div>
+  }
+
+  @if (error) {
+    <div class="flex-1 flex items-center justify-center">
+      <p class="text-red-400 font-mono text-sm">❌ {{ error }}</p>
+    </div>
+  }
+
+  @if (resultat) {
+    <ngx-extended-pdf-viewer
+      [src]="resultat"
+      [showToolbar]="true"
+
+      [showDrawEditor]="false"
+      [showStampEditor]="false"
+      [showTextEditor]="false"
+      [showHighlightEditor]="false"
+
+      [showSidebarButton]="true"
+      [showFindButton]="true"
+      [showPagingButtons]="true"
+      [showZoomButtons]="true"
+      [showPresentationModeButton]="false"
+      [showOpenFileButton]="false"
+      [showPrintButton]="false"
+      [showDownloadButton]="false"
+      [showSecondaryToolbarButton]="false"
+      height="calc(100vh - 52px)">
+    </ngx-extended-pdf-viewer>
+  }
+
+</div>

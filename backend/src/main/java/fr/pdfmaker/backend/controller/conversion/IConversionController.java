@@ -3,7 +3,13 @@ package fr.pdfmaker.backend.controller.conversion;
 import fr.pdfmaker.backend.model.dto.conversion.ConversionResultatDto;
 import fr.pdfmaker.backend.model.dto.conversion.ImageConversionRequestDto;
 import fr.pdfmaker.backend.model.dto.conversion.TxtConversionRequestDto;
+import fr.pdfmaker.backend.model.entity.Utilisateur;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 
 /**
  * Interface pour le contrôleur de conversion. Cette interface définit les méthodes que le contrôleur de conversion doit implémenter pour gérer les requêtes liées à la conversion de fichiers en PDF.
@@ -13,17 +19,11 @@ import org.springframework.http.ResponseEntity;
  */
 public interface IConversionController {
 
-    /**
-     * Fonction pour récupérer un fichier à partir de son chemin complet. Cette méthode peut être utilisée pour télécharger un fichier converti ou pour accéder à un fichier stocké sur le serveur.
-     * @param fullPath
-     * @return le fichier sous forme de tableau de bytes, encapsulé dans une ResponseEntity pour permettre une gestion appropriée des en-têtes HTTP et du statut de la réponse.
-     */
-    ResponseEntity<byte[]> getFichier(String fullPath);
 
 
-    ResponseEntity<ConversionResultatDto> convertirTxt(TxtConversionRequestDto request);
+    @PostMapping(value = "/txt-to-pdf", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    ResponseEntity<ConversionResultatDto> convertirTxt(@ModelAttribute TxtConversionRequestDto fichier, @AuthenticationPrincipal Utilisateur user) throws Exception;
 
-    ResponseEntity<ConversionResultatDto>convertirImage (ImageConversionRequestDto request);
-
-
+    @PostMapping(value = "/image-to-pdf", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    ResponseEntity<ConversionResultatDto> convertirImage(@ModelAttribute ImageConversionRequestDto request, @AuthenticationPrincipal Utilisateur user) throws Exception;
 }

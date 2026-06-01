@@ -49,10 +49,10 @@ public class Utilisateur implements UserDetails  {
     @Column(name = "salt", length = 255, nullable = false)
     private String salt;
 
-    @JsonIgnore
+   /* @JsonIgnore
     @OneToMany(fetch = FetchType.LAZY , mappedBy = "utilisateur", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Operation> operations = new HashSet<>();
-
+*/
     @JsonIgnore
     @OneToMany( fetch = FetchType.LAZY , mappedBy = "utilisateur", cascade = CascadeType.ALL)
     private Set<CoffreAccessLog> accessLogs = new HashSet<>();

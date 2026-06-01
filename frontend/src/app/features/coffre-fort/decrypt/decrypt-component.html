@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -7,25 +7,25 @@
 <body>
 
   <h1>Déchiffrer un fichier</h1>
-
+  <!--
   <form (submit)="onSubmit()">
 
-    <div class="form-group">
-      <label for="fichierChiffre">Fichier à déchiffrer</label>
-      <input
-        type="file"
-        id="fichierChiffre"
-        (change)="onFichierChange($event)"
-        required
-      />
-      @if(fichierSelectionne) {
-      <span class="fichier-nom">
-        📄 {{ fichierSelectionne?.name }}
-      </span>
-      }
-    </div>
+        <div class="form-group">
+          <label for="fichierChiffre">Fichier à déchiffrer</label>
+          <input
+            type="file"
+            id="fichierChiffre"
+            (change)="onFichierChange($event)"
+            required
+          />
+          @if(fichierSelectionne) {
+          <span class="fichier-nom">
+            📄 {{ fichierSelectionne?.name }}
+          </span>
+          }
+        </div>
 
-    <!-- Nom du fichier de sortie -->
+    -->
     <!--  <div class="form-group">
         <label for="nomFichierSortie">Nom du fichier de sortie</label>
         <input
@@ -36,8 +36,9 @@
           placeholder="ex: mon_fichier_dechiffre"
           required
         /
-       </div>>-->
-
+       </div>>
+-->
+    <!--
       <div class="form-group">
         <label for="motDePasse">Mot de passe</label>
         <input
@@ -49,7 +50,9 @@
           required
         />
       </div>
+      -->
 
+    <!--
       <button type="submit" [disabled] ="!fichierSelectionne  || chargement">
         @if (!chargement) {
           <span >🔒 Déchiffrer</span>
@@ -61,6 +64,10 @@
       </button>
 
       </form>
+
+      -->
+
+  <!--
     @if (resultat) {
       <ngx-extended-pdf-viewer
         [src]="resultat"
@@ -80,3 +87,5 @@
 
   </body>
   </html>
+
+-->

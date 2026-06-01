@@ -1,4 +1,4 @@
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {ConversionTxtResponse} from '@core/models/conversion/conversion-txt-response.model';
 import {ConversionTxtRequest} from '@core/models/conversion/conversion-txt-request.model';
 import {Observable} from 'rxjs';
@@ -19,7 +19,7 @@ export class  ConversionService {
   convertirTxtEnPdf(request : ConversionTxtRequest) : Observable<ConversionTxtResponse>  {
 
     const formData = new FormData();
-    //formData.append('fichier', request.nomFichierSortie);
+    formData.append('fichier', request.nomFichierSortie);
     formData.append('nomFichierSortie', request.nomFichierSortie);
     formData.append('fichier', request.fichier as File );
 

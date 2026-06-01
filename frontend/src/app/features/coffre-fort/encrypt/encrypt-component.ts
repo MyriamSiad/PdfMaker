@@ -17,7 +17,7 @@ import {jwtDecode} from 'jwt-decode';
   //styleUrls: ['encrypt.component.scss']
 })
 export class EncryptComponent {
-
+/*
   fichierSelectionne: File | null = null;
   nomFichierSortie: string = '';
   chargement: boolean = false;
@@ -98,7 +98,7 @@ export class EncryptComponent {
           this.chargement = false;
           console.error(err);
         }
-      });*/
+      });
 
 
   }
@@ -116,4 +116,6 @@ export class EncryptComponent {
         this.chargement = false;
       });
   }
+
+ */
 }

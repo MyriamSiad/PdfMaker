@@ -12,15 +12,15 @@ import lombok.*;
 @AllArgsConstructor
 public class ConversionResultatDto {
     private boolean success;
-    private byte[] fichierPdf;
-    private String outputPath;
     private String message;
+    private byte[] fichierPdf;
+    private String nomFichierSortie;
 
-    public ConversionResultatDto(String outputPath, byte[] fichierPdf) {
+    public ConversionResultatDto(String nomFichierSortie, byte[] fichierPdf) {
         this.success = true;
-        this.outputPath = outputPath;
         this.fichierPdf = fichierPdf;
         this.message = "Conversion réussie";
+        this.nomFichierSortie = nomFichierSortie;
     }
 
 }

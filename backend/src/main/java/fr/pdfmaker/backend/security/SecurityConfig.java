@@ -44,8 +44,8 @@ public class SecurityConfig {
                 .formLogin(form -> form.disable())  // ← ajoute ça
                 .httpBasic(basic -> basic.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/rest/user/login", "/api/rest/user/register").permitAll() // routes publiques
-                        .anyRequest().authenticated()                        // tout le reste → authentifié
+                        .requestMatchers("/api/rest/user/login", "/api/rest/user/register").permitAll()
+                        .anyRequest().authenticated()
                 )  .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )

@@ -1,8 +1,11 @@
 package fr.pdfmaker.backend.service.coffrefort;
 
 import fr.pdfmaker.backend.model.dto.utilisateur.UtilisateurSecretDetailDto;
+import fr.pdfmaker.backend.model.entity.DossierVirtuel;
+import fr.pdfmaker.backend.model.entity.Fichier;
 import fr.pdfmaker.backend.model.entity.Utilisateur;
 import fr.pdfmaker.backend.repository.IUtilisateurRepository;
+import fr.pdfmaker.backend.service.FichierService;
 import fr.pdfmaker.backend.service.commun.FormatVerification;
 import fr.pdfmaker.backend.utils.DtoUserConverter;
 import jdk.jshell.execution.Util;
@@ -16,6 +19,8 @@ import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.ByteArrayOutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -33,7 +38,16 @@ import static java.util.Base64.getEncoder;
 public class EncryptService {
 
     @Autowired
+    private CoffreFortSessionService vaultSessionService;
+
+    @Autowired
     private IUtilisateurRepository iUtilisateurRepository;
+
+    @Autowired
+    private StorageService storageService;
+
+    @Autowired
+            private FichierService fichierService;
 
     FormatVerification verifyFormat = new FormatVerification();
     public byte [] masterKeyGenerator( ) {
@@ -44,6 +58,9 @@ public class EncryptService {
         return masterKeyBytes;
     }
 
+
+
+    // 3. Écriture physique sur le disque de la machine
 
 
     /**
@@ -66,6 +83,8 @@ public class EncryptService {
             byte[] ivPlusCipher = new byte[iv.length + encryptedMasterKey.length];
             System.arraycopy(iv, 0, ivPlusCipher, 0, iv.length);
             System.arraycopy(encryptedMasterKey, 0, ivPlusCipher, iv.length, encryptedMasterKey.length);
+
+
 
             return getEncoder().encodeToString(ivPlusCipher);
         } catch (NoSuchAlgorithmException  e) {
@@ -150,6 +169,7 @@ public class EncryptService {
             utilisateurSecretDetailDto.setIdUser(user.getIdUser());
             utilisateurSecretDetailDto.setSalt(user.getSalt());
             utilisateurSecretDetailDto.setMasterKey(user.getMasterKey());
+            utilisateurSecretDetailDto.setPasswordHash(user.getPasswordHash());
 
             return  utilisateurSecretDetailDto;
         }catch (Exception e){
@@ -160,7 +180,7 @@ public class EncryptService {
     }
 
 
-   public byte [] encryptPdf( Long idUser, byte [] fichierPdf , String motDePasse) throws Exception {
+   public byte [] encryptPdf( Long idUser, byte [] fichierPdf , String nomFichierOriginal , Long idDossier) throws Exception {
 
          UtilisateurSecretDetailDto userSecretDetailDto = userSecretDetail(idUser);
             try{
@@ -168,13 +188,12 @@ public class EncryptService {
                     //throw new EncryptionException("Format pdf invalide ");
                 }
                     String masterKey= userSecretDetailDto.getMasterKey();
+                   String  motDePasse = vaultSessionService.getPassword(idUser);
                     byte [] secretKey =  secretKeyGenerator (motDePasse, userSecretDetailDto.getSalt());
 
                     byte [] iv = generateIv();
 
-                System.out.println("=== SECRET KEY CHIFFREMENT === " + Arrays.toString(secretKey));
                     byte [] masterKeyBrute = dechiffrageMasterKey(masterKey , secretKey);
-                    System.out.println("=== MASTER KEY LENGTH === " + masterKeyBrute.length);
 
                     SecretKey secretKey_ = new SecretKeySpec(masterKeyBrute, "AES");
                     Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
@@ -183,8 +202,26 @@ public class EncryptService {
                     byte[] encryptedPdf = cipher.doFinal(fichierPdf);
 
                     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-                    outputStream.write(iv);           // 12 bytes
+                    outputStream.write(iv);
                     outputStream.write(encryptedPdf);
+                    Path targetPath = storageService.getTargetFilePath(java.util.UUID.randomUUID().toString() + ".enc");
+
+                    Fichier file = new Fichier();
+                    file.setDateAjout(java.time.LocalDateTime.now());
+                    file.setUtilisateur(iUtilisateurRepository.findByIdUser(idUser));
+                    file.setNomOriginal(nomFichierOriginal);
+                    file.setNomStockage(targetPath.getFileName().toString());
+                    //Files.write(targetPath, encryptedPdf);
+                    file.setCheminLocal(targetPath.toAbsolutePath().toString());
+                    DossierVirtuel dossierVirtuel = new DossierVirtuel();
+                    if(idDossier == null) {
+                        dossierVirtuel.setIdDossier(1L);
+                    }
+                    dossierVirtuel.setIdDossier(idDossier);
+                    file.setDossier(dossierVirtuel);
+                    fichierService.saveFichier(file);
+                    Files.write(targetPath, outputStream.toByteArray());
+                    System.out.println("Fichier chiffré  " + idUser + " dans : " + targetPath.toAbsolutePath());
                     return outputStream.toByteArray();
 
             }catch(Exception e){
@@ -195,27 +232,30 @@ public class EncryptService {
     }
 
 
+    public  void encryptPdfSaved(Long idUser, byte [] fichierPdf , String nomFichierOrignal) throws Exception {
+
+
+    }
     public byte[] decryptPdf(Long idUser, byte [] fichierCrypte) throws Exception {
 
 
         try{
             UtilisateurSecretDetailDto userSecretDetailDto = userSecretDetail(idUser);
+            String motDePasse = vaultSessionService.getPassword(idUser);
+            byte[] iv = Arrays.copyOfRange(fichierCrypte, 0, 12);
+            byte[] ciphertext = Arrays.copyOfRange(fichierCrypte, 12, fichierCrypte.length);
 
-            byte [] iv = generateIv();
-
-            byte [] secretKey = secretKeyGenerator(userSecretDetailDto.getPasswordHash() , userSecretDetailDto.getSalt());
+            byte [] secretKey = secretKeyGenerator(motDePasse, userSecretDetailDto.getSalt());
             byte [] masterKeyBrute = dechiffrageMasterKey(userSecretDetailDto.getMasterKey() , secretKey);
             SecretKey secretKey_ = new SecretKeySpec(masterKeyBrute, "AES");
 
             Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
             cipher.init(Cipher.DECRYPT_MODE, secretKey_,new GCMParameterSpec(128, iv));
 
-            byte[] decryptedPdf = cipher.doFinal(fichierCrypte);
 
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            outputStream.write(iv);           // 12 bytes
-            outputStream.write(decryptedPdf);
-            return outputStream.toByteArray();
+
+
+            return  cipher.doFinal(ciphertext);
 
         }catch (Exception e){
 

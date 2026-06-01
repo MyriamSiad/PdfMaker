@@ -1,4 +1,5 @@
 package fr.pdfmaker.backend.model.entity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -18,11 +19,12 @@ id_fichier
 
 @Getter
 @ToString
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
 @Entity
-@Table (name = "fichier_pdf")
+@Table (name = "fichier")
 public class Fichier {
 
     @Id
@@ -38,17 +40,6 @@ public class Fichier {
     @Column(name = "nom_stockage", length = 255, nullable = false, unique = true)
     private String nomStockage;
 
-    @Column(name = "algorithme_chiffrement", length = 50, nullable = false)
-    private String algorithmeChiffrement;
-
-
-    @Column(name = "hash_fichier", length = 64, nullable = false)
-    private String hashFichier;
-
-
-    @Column(name = "iv_chiffrement", length = 500, nullable = false)
-    private String ivChiffrement;
-
     @Column(name = "chemin_local", length = 255)
     private String cheminLocal;
 
@@ -58,12 +49,11 @@ public class Fichier {
     private Utilisateur utilisateur;
 
 
-    @OneToMany(mappedBy = "fichier", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<OperationFichier> operationFichiers = new HashSet<>();
+    @ManyToOne
+    @JoinColumn(name = "id_dossier")
+    private DossierVirtuel dossier;
 
 
-    @OneToMany(mappedBy = "fichier", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<FichiersDossiers> fichiersDossiers = new HashSet<>();
 
 }
 

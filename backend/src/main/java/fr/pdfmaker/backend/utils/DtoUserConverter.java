@@ -54,4 +54,15 @@ public final  class DtoUserConverter {
 
         return userSecretDetailDto;
     }
+
+
+
+    public static Utilisateur convertUserDtoToUser(UtilisateurDto userDto){
+        Utilisateur user = new Utilisateur();
+        user.setPrenom(userDto.getPrenom());
+        user.setNom(userDto.getNom());
+        user.setEmail(userDto.getEmail());
+        user.setIdUser(userDto.getIdUser());
+        return user;
+    }
 }

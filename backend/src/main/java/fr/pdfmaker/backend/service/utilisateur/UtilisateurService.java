@@ -8,6 +8,7 @@ import fr.pdfmaker.backend.model.dto.utilisateur.UtilisateurDto;
 import fr.pdfmaker.backend.model.entity.Utilisateur;
 import fr.pdfmaker.backend.repository.IUtilisateurRepository;
 import fr.pdfmaker.backend.service.coffrefort.EncryptService;
+import fr.pdfmaker.backend.service.dossier.DossierStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -30,9 +31,15 @@ public class UtilisateurService implements IUtilisateurService {
     @Autowired
     private  PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private DossierStorageService dossierStorageService;
+
     @Override
     public UtilisateurDto getUtilsateur(long id) throws Exception {
-        return null;
+
+        Utilisateur utilisateur = utilisateurRepository.findById(id).get();
+
+        return convertUserToUserDto(utilisateur);
     }
 
     /**
@@ -103,7 +110,7 @@ public class UtilisateurService implements IUtilisateurService {
      * @return true si les deux mots de passe correspondent, false le cas inverse
      * @author Myriam S.
      */
-    private boolean verifyPassword(String rawPassword, String encodedPassword){
+    public boolean verifyPassword(String rawPassword, String encodedPassword){
         return passwordEncoder.matches(rawPassword, encodedPassword);
     }
 
@@ -121,8 +128,11 @@ public class UtilisateurService implements IUtilisateurService {
             user.setPasswordHash(passwordEncoder.encode(user.getPasswordHash()));
             user.setMasterKey(masterKey);
             Utilisateur _user = convertUserDtoToUser(user);
+            Long id =  utilisateurRepository.save(_user).getIdUser();
+            dossierStorageService.initialiserDossier(id, "Mon Coffre-" + user.getPrenom());
 
-            return utilisateurRepository.save(_user).getIdUser();
+            return id;
+
     }
 
     @Override

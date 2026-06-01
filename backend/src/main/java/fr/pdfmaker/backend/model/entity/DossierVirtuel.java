@@ -1,17 +1,17 @@
 package fr.pdfmaker.backend.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.HashSet;
 import java.util.Set;
 @Entity
 @Table(name = "dossier_virtuel")
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
 public class DossierVirtuel {
 
     @Id
@@ -19,8 +19,6 @@ public class DossierVirtuel {
     @Column(name = "id_dossier")
     private Long idDossier;
 
-    @Column(name = "id_dossier_parent")
-    private Long idDossierParent;
 
     @Column(name = "nom_du_dossier", length = 255, nullable = false)
     private String nomDuDossier;
@@ -28,18 +26,15 @@ public class DossierVirtuel {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_user", nullable = false)
+    @JsonIgnore
     private Utilisateur utilisateur;
 
+    @Column(name = "is_system")
+    private Boolean isSystem;
 
-    @OneToMany(mappedBy = "dossier", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<FichiersDossiers> fichiersDossiers = new HashSet<>();
+    @JsonIgnore
+    @OneToMany(mappedBy = "dossier", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private Set<Fichier> fichiers = new HashSet<>();
 
 
-    @OneToMany
-    @JoinColumn(name = "id_dossier_parent")
-    private Set<DossierVirtuel> sousDossiers = new HashSet<>();
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_dossier_parent", insertable = false, updatable = false)
-    private DossierVirtuel dossierParent;
 }

@@ -4,6 +4,7 @@ import { AuthGuard } from '@core/guards/auth.guard';
 import {TxtToPdfComponent} from '@features/conversion/conversion.txt.component';
 
 import {HomeComponent} from '@features/home/home.component';
+import {PdfViewerComponent} from '@features/pdf-viewer/pdf-viewer.component';
 
  export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' }, // redirection par défaut
@@ -24,15 +25,13 @@ import {HomeComponent} from '@features/home/home.component';
          loadComponent : () => import ('@features/conversion/conversion.component').then(m => m.ConversionComponent)
        },
 
-       /*{ path : 'coffre-fort',
-         loadComponent : () => import ('@features/coffre-fort/coffre-fort-component').then(m => m.ConversionComponent)
-       }*/
+       { path : 'coffre-fort',
+         loadComponent : () => import ('@features/coffre-fort/coffre-fort-component').then(m => m.VaultComponent)
+       },
 
-       { path : 'coffre-fort/encrypt',
-       loadComponent : () => import ('@features/coffre-fort/encrypt/encrypt-component').then(m => m.EncryptComponent)
-     },
-       { path : 'coffre-fort/decrypt',
-         loadComponent : () => import ('@features/coffre-fort/decrypt/decrypt-component').then(m => m.DecryptComponent)
+
+       { path :'viewer/:idFichier',
+         loadComponent : () => import ('@features/pdf-viewer/pdf-viewer.component').then(m => m.PdfViewerComponent)
        }
 
 

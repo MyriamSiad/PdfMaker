@@ -1,5 +1,7 @@
 package fr.pdfmaker.backend.service.conversion;
 
+import fr.pdfmaker.backend.service.FichierService;
+import jakarta.transaction.Transactional;
 import org.openpdf.text.Document;
 import org.openpdf.text.Image;
 import org.openpdf.text.PageSize;
@@ -16,8 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
+
 
 /**
  * Convertit un fichier JPEG en PDF via OpenPDF.
@@ -32,19 +33,26 @@ import java.nio.file.Path;
 public class ImageToPdfService implements IConversionService<ImageConversionRequestDto> {
 
 
+    private final  FichierService fichierService;
+
     private static final byte[] MAGIC_JPEG = { (byte)0xFF, (byte)0xD8, (byte)0xFF };
     private static final byte[] MAGIC_PNG  = { (byte)0x89, 0x50, 0x4E, 0x47 };
     private static final byte[] MAGIC_WEBP = { 0x52, 0x49, 0x46, 0x46 }; // RIFF
+
+    public ImageToPdfService(FichierService fichierService) {
+        this.fichierService = fichierService;
+    }
     //private static final byte[] MAGIC_BMP  = { 0x42, 0x4D };              // BM
     //private static final byte[] MAGIC_GIF  = { 0x47, 0x49, 0x46, 0x38 }; // GIF8
     //private static final byte[] MAGIC_TIFF = { 0x49, 0x49, 0x2A, 0x00 }; // Little-endian
+
 
     @Override
     public ConversionResultatDto convertToPdf(String inputPathFichier) {
         return null;
     }
 
-
+    @Transactional
     public ConversionResultatDto convert(ImageConversionRequestDto request) {
         MultipartFile fichier = request.getFichier();
 
@@ -59,6 +67,7 @@ public class ImageToPdfService implements IConversionService<ImageConversionRequ
 
             byte[] donneesImage = fichier.getBytes();
             byte[] contenuPdf   = genererPdf(donneesImage, request.isAdapterALaPage());
+
 
             return new ConversionResultatDto(request.getNomFichierSortie() + ".pdf", contenuPdf);
 

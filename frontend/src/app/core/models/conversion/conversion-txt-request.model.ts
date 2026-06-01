@@ -1,3 +1,4 @@
+import {createJitResourceTransformer} from '@angular/build/private';
 
 export class ConversionTxtRequest {
 
@@ -5,9 +6,8 @@ export class ConversionTxtRequest {
   cheminFichier: string = "";
   fichier : File | null = null;
 
-
   constructor(cheminFichier: string, cheminSortie: string , fichier: File | null = null) {
-    this.cheminFichier = cheminFichier;
+    this.cheminFichier = fichier?.webkitRelativePath || cheminFichier;
    this.nomFichierSortie  =  fichier?.name.replace('.txt', '') || cheminSortie;
    this.fichier = fichier;
 
