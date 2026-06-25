@@ -144,12 +144,12 @@
             <button type="button" (click)="togglePage(previewPage); closePreview()"
                     class="w-full sm:w-auto px-5 py-2.5 text-sm font-semibold rounded-full border transition-colors cursor-pointer text-center"
                     [class.bg-error]="previewPage.selected"
-            [class.text-error]="previewPage.selected"
+            [class.text-white]="previewPage.selected"
             [class.border-error]="previewPage.selected"
             [class.bg-primary]="!previewPage.selected"
             [class.text-primary-on]="!previewPage.selected"
             [class.border-transparent]="!previewPage.selected">
-            {{ previewPage.selected ? '❌ Désélectionner la page' : '✅ Sélectionner la page' }}
+            {{ previewPage.selected ? ' Désélectionner la page' : ' Sélectionner la page' }}
             </button>
             <button type="button" (click)="closePreview()" class="w-full sm:w-auto px-5 py-2.5 bg-surface-container-high text-on-surface text-sm font-semibold rounded-full hover:bg-outline-variant/40 cursor-pointer border-none transition-colors text-center">
               Fermer

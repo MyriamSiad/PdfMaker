@@ -10,6 +10,10 @@ interface PageThumbnail {
   dataUrl: string;
   selected: boolean;
 }
+pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
+  'pdfjs-dist/build/pdf.worker.min.mjs',
+  import.meta.url
+).toString();
 
 @Component({
   selector: 'app-split-pdf',
@@ -134,4 +138,8 @@ export class SeparationComponent {
     if (selected.length === 0) return 'Aucune';
     return 'Page ' + selected.join(', ');
   }
+
+
+
+
 }
