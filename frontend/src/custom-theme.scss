@@ -1,30 +1,95 @@
-@use '@angular/material' as mat;
+@theme {
+  /* --- Palette de Surfaces : Propre, moderne et sans teinte jaune --- */
+  --color-surface: #ffffff;                 /* Blanc pur cristallin */
+  --color-surface-dim: #f8fafc;             /* Gris bleuté très frais (Slate 50) */
+  --color-surface-bright: #ffffff;
+  --color-surface-variant: #f1f5f9;         /* Slate 100 pour les champs de saisie */
 
-html {
-  @include mat.theme((
-    color: (
-      primary: mat.$azure-palette,
-      tertiary: mat.$blue-palette,
-    ),
-    typography: Roboto,
-    density: 0,
-  ));
+  /* Conteneurs et cartes (Style épuré, sans teinte jaune) */
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #f8fafc;
+  --color-surface-container: #f1f5f9;
+  --color-surface-container-high: #e2e8f0;
+  --color-surface-container-highest: #cbd5e1;
+
+  /* --- Textes : Contrastes profonds de haute lisibilité --- */
+  --color-on-surface: #0f172a;              /* Slate 900 : Noir ardoise adouci */
+  --color-on-surface-variant: #475569;      /* Slate 600 : Pour le texte secondaire */
+
+  /* --- Inverse Surface (Le vert forêt exact de ton image de sidebar) --- */
+  --color-inverse-surface: #0c1f17;         /* Vert émeraude très sombre premium */
+  --color-inverse-surface-mid: #163326;     /* Pour les états de survol (hover) dans les menus sombres */
+  --color-inverse-surface-high: #214736;    /* Pour l’élément actif de la navigation */
+  --color-inverse-on-surface: #ffffff;      /* Texte blanc pur par-dessus */
+  --color-inverse-on-surface-muted: #8fa396; /* Textes secondaires et icônes inactives */
+
+  /* --- Bordures ciselées --- */
+  --color-outline: #64748b;
+  --color-outline-variant: #e2e8f0;         /* Lignes ultra-fines entre composants */
+
+  /* --- ACCENT PRINCIPAL : Émeraude Alpin Premium --- */
+  --color-surface-tint: #0b4f36;
+  --color-primary: #0b4f36;                 /* Vert marque : profond, pro et organique */
+  --color-primary-on: #ffffff;              /* Texte blanc pur par-dessus */
+  --color-primary-hover: #0d5e41;           /* Teinte de survol des boutons */
+  --color-primary-container: #146a39;       /* Fond vert menthe clair pour les icônes de la dropzone/badges */
+  --color-primary-on-container: #0c1f17;    /* Texte/Icône sombre sur fond menthe */
+
+  /* --- ACCENT SECONDAIRE : Teal & Liens --- */
+  --color-secondary: #0284c7;               /* Une pointe de Bleu Horizon pour les liens importants */
+  --color-secondary-on: #ffffff;
+  --color-secondary-container: #d1fae5;
+  --color-secondary-on-container: #084536;
+
+  /* --- Alertes --- */
+  --color-error: #dc2626;
+  --color-error-on: #ffffff;
+  --color-error-container: #fee2e2;
+  --color-error-on-container: #7f1d1d;
+
+  --color-background: #ffffff;
+  --color-on-background: #0f172a;
+
+  /* --- Typographies --- */
+  --font-headline: "Plus Jakarta Sans", "Inter", sans-serif;
+  --font-body: "Inter", sans-serif;
+
+  /* --- Arrondis --- */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.625rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
 }
 
-body {
-  // Default the application to a light color theme. This can be changed to
-  // `dark` to enable the dark color theme, or to `light dark` to defer to the
-  // user's system settings.
-  color-scheme: light;
-
-  // Set a default background, font and text colors for the application using
-  // Angular Material's system-level CSS variables. Learn more about these
-  // variables at https://material.angular.dev/guide/system-variables
-  background-color: var(--mat-sys-surface);
-  color: var(--mat-sys-on-surface);
-  font: var(--mat-sys-body-medium);
-
-  // Reset the user agent margin.
-  margin: 0;
+/* --- Styles des éléments --- */
+.text-headline-lg {
+  font-family: var(--font-headline);
+  font-size: 34px;
+  font-weight: 700;
+  line-height: 42px;
+  letter-spacing: -0.03em;
+  color: var(--color-on-surface);
 }
 
+.text-headline-md {
+  font-family: var(--font-headline);
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 32px;
+  letter-spacing: -0.02em;
+}
+
+/* Zone de dépôt des PDF : Épurée, la lueur au survol devient le vert émeraude chic */
+.cozy-card {
+  background-color: var(--color-surface-container-lowest);
+  border: 1px dashed var(--color-outline-highest, #cbd5e1);
+  border-radius: var(--radius-xl);
+  transition: all 0.2s ease-in-out;
+
+  &:hover {
+    transform: translateY(-2px);
+    border-color: var(--color-primary); /* Devient Émeraude au survol */
+    border-style: solid;
+    box-shadow: 0 12px 30px rgba(11, 79, 54, 0.05); /* Douce ombre teintée émeraude */
+  }
+}

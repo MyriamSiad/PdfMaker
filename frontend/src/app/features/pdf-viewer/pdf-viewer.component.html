@@ -1,48 +1,64 @@
-<div class="min-h-screen bg-[#0c0f14] flex flex-col">
+<div class="min-h-screen bg-surface-dim font-body text-on-surface flex flex-col">
 
-  <!-- Header -->
-  <div class="flex items-center gap-3 px-5 py-3 border-b border-[#1e2535]">
+  <div class="flex items-center gap-4 px-6 py-3 border-b border-outline-variant/50 bg-white shadow-xs">
     <button (click)="retour()"
-            class="text-sm text-gray-400 hover:text-amber-600 transition-colors">
-      ← Retour
+            class="flex items-center gap-1.5 text-sm font-semibold text-on-surface-variant hover:text-[#0b4f36] transition-colors cursor-pointer p-1 rounded-lg hover:bg-surface-dim">
+      <mat-icon fontIcon="arrow_back" class="!text-sm !w-4 !h-4 flex items-center justify-center"></mat-icon>
+      Retour
     </button>
-    <span class="text-[#e8e0d0] text-sm font-mono">Visionneuse PDF</span>
+    <div class="h-4 w-px bg-outline-variant/60"></div>
+    <span class="text-xs font-bold font-headline uppercase tracking-wider text-on-surface-variant/80">Visionneuse Sécurisée</span>
   </div>
 
-  <!-- Contenu -->
-  @if (loading) {
-    <div class="flex-1 flex items-center justify-center">
-      <p class="text-gray-500 font-mono text-sm animate-pulse">Déchiffrement en cours...</p>
-    </div>
-  }
+  <div class="flex-1 relative flex flex-col">
 
-  @if (error) {
-    <div class="flex-1 flex items-center justify-center">
-      <p class="text-red-400 font-mono text-sm">❌ {{ error }}</p>
-    </div>
-  }
+    @if (loading) {
+      <div class="absolute inset-0 flex flex-col items-center justify-center bg-surface-dim gap-3 animate-fadeIn">
+        <div class="w-10 h-10 rounded-full bg-primary-container text-[#0b4f36] flex items-center justify-center animate-spin border-2 border-dashed border-[#0b4f36]">
+          <mat-icon fontIcon="lock_open" class="!text-lg !w-5 !h-5 flex items-center justify-center"></mat-icon>
+        </div>
+        <p class="text-sm font-bold text-on-surface">Déchiffrement sécurisé en cours...</p>
+        <p class="text-xs text-on-surface-variant/70">Votre document est traité localement.</p>
+      </div>
+    }
 
-  @if (resultat) {
-    <ngx-extended-pdf-viewer
-      [src]="resultat"
-      [showToolbar]="true"
+    @if (error) {
+      <div class="absolute inset-0 flex flex-col items-center justify-center bg-surface-dim gap-2 p-4 text-center animate-fadeIn">
+        <div class="w-12 h-12 rounded-full bg-error-container text-error flex items-center justify-center mb-1">
+          <mat-icon fontIcon="error_outline" class="!text-xl !w-6 !h-6 flex items-center justify-center"></mat-icon>
+        </div>
+        <p class="text-sm font-bold text-error">Échec du décryptage</p>
+        <p class="text-xs text-on-surface-variant max-w-sm">{{ error }}</p>
+        <button (click)="retour()" class="mt-2 px-4 py-2 bg-white border border-outline-variant rounded-full text-xs font-bold text-on-surface hover:bg-surface-container-low transition-colors cursor-pointer">
+          Quitter la visionneuse
+        </button>
+      </div>
+    }
 
-      [showDrawEditor]="false"
-      [showStampEditor]="false"
-      [showTextEditor]="false"
-      [showHighlightEditor]="false"
+    @if (resultat && !loading) {
+      <div class="flex-1 w-full bg-surface-container-low">
+        <ngx-extended-pdf-viewer
+          [src]="resultat"
+          [showToolbar]="true"
 
-      [showSidebarButton]="true"
-      [showFindButton]="true"
-      [showPagingButtons]="true"
-      [showZoomButtons]="true"
-      [showPresentationModeButton]="false"
-      [showOpenFileButton]="false"
-      [showPrintButton]="false"
-      [showDownloadButton]="false"
-      [showSecondaryToolbarButton]="false"
-      height="calc(100vh - 52px)">
-    </ngx-extended-pdf-viewer>
-  }
+          [showDrawEditor]="false"
+          [showStampEditor]="false"
+          [showTextEditor]="false"
+          [showHighlightEditor]="false"
+
+          [showSidebarButton]="true"
+          [showFindButton]="true"
+          [showPagingButtons]="true"
+          [showZoomButtons]="true"
+          [showPresentationModeButton]="false"
+          [showOpenFileButton]="false"
+          [showPrintButton]="false"
+          [showDownloadButton]="false"
+          [showSecondaryToolbarButton]="false"
+          height="calc(100vh - 53px)">
+        </ngx-extended-pdf-viewer>
+      </div>
+    }
+  </div>
 
 </div>

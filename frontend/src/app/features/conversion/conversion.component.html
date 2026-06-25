@@ -1,22 +1,174 @@
+<div class="min-h-screen bg-surface text-on-surface p-8 md:p-12 font-body flex flex-col items-center justify-start relative overflow-hidden w-full">
 
-<div class="grid grid-cols-2  pt-10  gap-4 mb-2 content-center">
+  <div class="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl pointer-events-none"></div>
 
-  <button (click)="mode = 'txt'"
-    [ngClass]="mode === 'txt' ? 'border-[#1D6FCC] bg-blue-50' : 'border-gray-200 bg-white'"
-    class="p-4 rounded-2xl border-2 transition-all duration-200 text-left">
-    <p class="font-semibold text-gray-800">TXT → PDF</p>
-    <p class="text-xs text-gray-400 mt-1">Fichiers texte brut</p>
-  </button>
+  <div class="mb-4 inline-flex items-center gap-1.5 px-3 py-1  bg-[#d1fae5] text-primary-on-container border border-outline-variant/30 rounded-full text-xs font-semibold">
+    <span class="w-1.5 h-1.5 bg-primary rounded-full"></span>
+    Convertir des PDF
+  </div>
 
-  <button (click)="mode = 'image'"
-    [ngClass]="mode === 'image' ? 'border-[#1D6FCC] bg-blue-50' : 'border-gray-200 bg-white'"
-    class="p-4 rounded-2xl border-2 transition-all duration-200 text-left">
-    <p class="font-semibold text-gray-800">Image → PDF</p>
-    <p class="text-xs text-gray-400 mt-1">JPEG, PNG, WEBP</p>
-  </button>
+  <div class="text-center max-w-2xl mb-8">
+    <h1 class="text-headline-lg text-on-surface mb-4">Convertir des PDF</h1>
+    <p class="text-on-surface-variant text-base leading-relaxed">
+      Transformez vos fichiers image et texte en format PDF en toute sécurité. Le traitement local garantit que vos données restent sur votre machine.
+    </p>
+  </div>
+
+  <div class="w-full max-w-5xl bg-surface-container-lowest border border-outline-variant/60 rounded-xl p-6 md:p-10 shadow-xs relative">
+
+    @if (erreur) {
+      <div class="mb-6 px-4 py-3 rounded-md bg-error-container text-error text-sm border border-error/20 flex items-center gap-2 animate-fadeIn">
+        <mat-icon fontIcon="error" class="scale-90"></mat-icon>
+        <span>{{ erreur }}</span>
+      </div>
+    }
+
+    @if (success) {
+      <div class="mb-6 px-4 py-3 rounded-md bg-primary-container text-primary-on-container text-sm border border-outline-variant/30 flex items-center gap-2 animate-fadeIn">
+        <mat-icon fontIcon="check_circle" class="scale-90"></mat-icon>
+        <span>Fichier prêt au téléchargement !</span>
+      </div>
+    }
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+
+      <div class="lg:col-span-7 space-y-4 w-full">
+        <label class="block text-xs font-bold uppercase tracking-wider text-on-surface-variant">1. Sélectionnez votre fichier</label>
+
+        <input #fileInputTxt type="file" accept=".txt" class="hidden" (change)="onFileSelected($event)" />
+        <input #fileInputImg type="file" accept=".jpeg,.jpg,.png,.webp" class="hidden" (change)="onFileSelected($event)" />
+
+        <div
+          (dragover)="onDragOver($event)"
+          (dragleave)="onDragLeave()"
+          (drop)="onDrop($event)"
+          (click)="mode === 'txt' ? fileInputTxt.click() : fileInputImg.click()"
+          [class.bg-primary-container/20]="isDragOver"
+        [class.border-primary]="isDragOver"
+        [class.bg-surface-container-low]="!isDragOver && !fichier"
+        [class.bg-surface-container-lowest]="fichier && !isDragOver"
+        class="relative border-2 border-dashed border-outline-variant rounded-xl p-12 text-center cursor-pointer transition-all duration-300 min-h-[260px] flex flex-col justify-center items-center hover:border-primary">
+
+        @if (fichier) {
+          <div class="flex items-center justify-between p-5 bg-surface-container-lowest border border-outline-variant/60 rounded-xl text-left w-full max-w-md shadow-xs" (click)="$event.stopPropagation()">
+            <div class="flex items-center gap-4">
+              <div class="w-14 h-14 rounded-md bg-primary-container text-primary flex items-center justify-center shrink-0">
+                <mat-icon fontIcon="description" class="!text-3xl"></mat-icon>
+              </div>
+              <div class="overflow-hidden">
+                <p class="font-bold text-on-surface text-base truncate max-w-[200px] sm:max-w-[260px]">{{ fichier.name }}</p>
+                <p class="text-xs text-on-surface-variant mt-0.5">{{ (fichier.size / 1024 / 1024).toFixed(2) }} MB • Document</p>
+              </div>
+            </div>
+            <button (click)="fichier = null" class="w-9 h-9 rounded-full bg-error/10 text-error flex items-center justify-center hover:bg-error/20 transition-colors shrink-0 cursor-pointer border-none font-bold">✕</button>
+          </div>
+        } @else {
+          <div class="flex flex-col items-center gap-3">
+            <div class="w-16 h-17 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant/70 border border-outline-variant/40 mb-1">
+              <mat-icon fontIcon="cloud_upload" class="!text-3xl flex items-center justify-center"></mat-icon>
+            </div>
+            <p class="font-bold text-on-surface text-base">Glissez-déposez votre fichier ici</p>
+            <p class="text-xs text-on-surface-variant">ou <span class="text-primary font-semibold underline decoration-1">parcourez vos dossiers locaux</span></p>
+          </div>
+        }
+      </div>
+    </div>
+
+    <div class="lg:col-span-5 space-y-6 w-full">
+
+      <div class="space-y-3">
+        <label class="block text-xs font-bold uppercase tracking-wider text-on-surface-variant">2. Format de sortie</label>
+        <div class="grid grid-cols-2 gap-3">
+
+          <button (click)="mode = 'image'"
+                  [class.border-primary]="mode === 'image'"
+                  [class.bg-surface-container-lowest]="mode === 'image'"
+                  [class.ring-1]="mode === 'image'"
+                  [class.ring-primary]="mode === 'image'"
+                  [class.border-outline-variant]="mode !== 'image'"
+                  [class.bg-surface-container-low]="mode !== 'image'"
+                  class="p-4 rounded-xl border-2 transition-all duration-200 text-left flex flex-col justify-between h-28 relative group cursor-pointer hover:border-outline">
+            @if (mode === 'image') {
+              <span class="absolute top-3 right-3 w-4 h-4 bg-primary text-primary-on rounded-full flex items-center justify-center text-[9px] font-bold">✓</span>
+            }
+            <div class="w-8 h-8 rounded-md bg-inverse-primary container text-primary flex items-center justify-center">
+              <mat-icon fontIcon="image" class="!text-lg"></mat-icon>
+            </div>
+            <span class="font-bold text-on-surface text-sm ">Image → PDF</span>
+          </button>
+
+          <button (click)="mode = 'txt'"
+                  [class.border-primary]="mode === 'txt'"
+                  [class.bg-surface-container-lowest]="mode === 'txt'"
+                  [class.ring-1]="mode === 'txt'"
+                  [class.ring-primary]="mode === 'txt'"
+                  [class.border-outline-variant]="mode !== 'txt'"
+                  [class.bg-surface-container-low]="mode !== 'txt'"
+                  class="p-4 rounded-xl border-2 transition-all duration-200 text-left flex flex-col justify-between h-28 relative group cursor-pointer hover:border-outline">
+            @if (mode === 'txt') {
+              <span class="absolute top-3 right-3 w-4 h-4 bg-primary text-primary-on rounded-full flex items-center justify-center text-[9px] font-bold">✓</span>
+            }
+            <div class="w-8 h-8 rounded-md bg-secondary-container text-secondary flex items-center justify-center">
+              <mat-icon fontIcon="text_fields" class="!text-lg"></mat-icon>
+            </div>
+            <span class="font-bold text-on-surface text-sm">Texte → PDF</span>
+          </button>
+        </div>
+      </div>
+
+      @if (mode === 'image') {
+        <div class="flex items-center justify-between p-3.5 bg-surface-container-low rounded-xl border border-outline-variant/40 animate-fadeIn">
+          <div>
+            <p class="text-xs font-bold text-on-surface">Adapter au format A4</p>
+            <p class="text-[11px] text-on-surface-variant mt-0.5">Redimensionne automatiquement l'image</p>
+          </div>
+          <button type="button" (click)="adapterALaPage = !adapterALaPage"
+                  [class.bg-primary]="adapterALaPage"
+                  [class.bg-outline-variant]="!adapterALaPage"
+                  class="relative w-10 h-5 rounded-full transition-colors duration-300 shrink-0 border-none cursor-pointer">
+              <span [class.translate-x-5]="adapterALaPage"
+                    [class.translate-x-0]="!adapterALaPage"
+                    class="absolute top-0.5 left-0.5 w-4 h-4 bg-surface-container-lowest rounded-full shadow-xs transition-transform duration-300">
+              </span>
+          </button>
+        </div>
+      }
+
+      <div class="space-y-2">
+        <label class="block text-xs font-bold uppercase tracking-wider text-on-surface-variant">3. Nom du fichier de sortie</label>
+        <div class="relative">
+          <input type="text" [(ngModel)]="nomFichierSortie" name="nomFichierSortie" placeholder="ex: rapport-document"
+                 class="w-full pl-4 pr-14 py-3 rounded-md border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary transition outline-none bg-surface-container-low text-on-surface text-sm font-medium" />
+          <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-on-surface-variant/70 bg-surface-container-high/60 px-2 py-1 rounded-md">.pdf</span>
+        </div>
+      </div>
+
+      <button (click)="onSubmit()" [disabled]="chargement || !fichier"
+              class="w-full py-4 rounded-full font-headline font-semibold text-primary-on transition-all duration-200 bg-primary hover:bg-primary-container disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm tracking-wide shadow-xs cursor-pointer">
+
+        @if (chargement) {
+          <svg class="animate-spin w-4 h-4 text-primary-on" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+          </svg>
+          <span>Conversion en cours...</span>
+        } @else {
+          <span>Convertir en PDF</span>
+          <span class="text-base font-sans">→</span>
+        }
+      </button>
+
+    </div>
+  </div>
+
+  <div class="mt-8 pt-6 border-t border-outline-variant/40 flex flex-col sm:flex-row justify-between items-center gap-3">
+    <p class="text-[11px] text-on-surface-variant/60 text-center sm:text-left font-medium">
+      Traitement local ultra-sécurisé · Aucune donnée ne quitte votre navigateur.
+    </p>
+    <span class="text-[11px] font-bold text-primary bg-primary/5 px-2.5 py-1 rounded-md border border-primary/10 tracking-wide uppercase flex items-center gap-1">
+        Confidentialité garantie 🛡️
+      </span>
+  </div>
 
 </div>
-
-<!-- Formulaire qui change selon le mode -->
-@if (mode === 'txt') { <app-txt-to-pdf /> }
-@if (mode === 'image') { <app-image-to-pdf/> }
+</div>

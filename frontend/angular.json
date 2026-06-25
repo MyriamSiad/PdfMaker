@@ -13,21 +13,23 @@
         "build": {
           "builder": "@angular/build:application",
           "options": {
+
             "browser": "src/main.ts",
             "polyfills": [
               "zone.js"
             ],
             "tsConfig": "tsconfig.app.json",
             "assets": [
+              "src/assets",
               {
-                "glob": "pdf.worker.min.mjs",
-                "input": "node_modules/pdfjs-dist/build/",
-                "output": "assets"
+                "glob": "**/*",
+                "input": "node_modules/ngx-extended-pdf-viewer/assets/",
+                "output": "/assets/"
               }
             ],
             "styles": [
               "src/custom-theme.scss",
-              "src/styles.css"
+              "src/styles.scss"
             ]
           },
           "configurations": {
@@ -82,14 +84,11 @@
               "src/favicon.ico",
               "src/assets",
               {
-
-                "glob": "pdf.worker.min.js",
-                "input": "node_modules/pdfjs-dist/build/",
-                "output": "assets"
+                "glob": "**/*",
+                "input": "node_modules/ngx-extended-pdf-viewer/assets/",
+                "output": "/assets/"
               }
-            ],
-            "styles": [
-              "src/styles.css"
+
             ]
           }
         }

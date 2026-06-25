@@ -1,125 +1,163 @@
-<h2 class="sr-only">Séparer un fichier PDF par sélection de pages</h2>
+<div class="min-h-screen bg-surface text-on-surface font-body flex flex-col gap-6 md:gap-8 w-full">
 
-<div class="p-8 max-w-6xl mx-auto flex flex-col gap-6">
+  <div class="flex-1 p-4 sm:p-6 md:p-8 max-w-[1400px] w-full mx-auto flex flex-col gap-6 md:gap-8">
 
-  <!-- Zone drop -->
-  @if (!splitFile) {
-    <div
-      (dragover)="onDragOver($event)"
-      (dragleave)="isDragOver = false"
-      (drop)="onDropSplit($event)"
-      (click)="splitInput.click()"
-      [class.border-amber-500]="isDragOver"
-      class="border-2 border-dashed border-[#2a3040] rounded-xl p-16 text-center
-             cursor-pointer transition-colors hover:border-amber-700/40 hover:bg-amber-700/[.03]">
-      <i class="ti ti-layout-grid text-4xl text-gray-500" aria-hidden="true"></i>
-      <p class="mt-3 mb-1 text-sm text-[#e8e0d0]">Glissez votre PDF ici</p>
-      <p class="text-xs text-gray-500">Sélectionnez les pages à extraire</p>
-      <input #splitInput type="file" accept=".pdf" (change)="onSplitFileSelected($event)" class="hidden"/>
+    <div class="flex flex-col items-start gap-2">
+      <span class="inline-flex items-center gap-1.5 bg-[#d1fae5] text-[#0b4f36] text-xs font-semibold px-3 py-1.5 rounded-full">
+  <mat-icon fontIcon="call_merge" class="scale-75"></mat-icon>
+  Séparer des PDF
+</span>
+      <h1 class="text-headline-md sm:text-headline-lg text-on-surface font-bold tracking-tight">Séparez des PDF</h1>
+      <p class="text-sm text-on-surface-variant max-w-2xl leading-relaxed">Ajoutez votre fichier PDF, sélectionnez les pages, puis séparez-les en un seul document.</p>
     </div>
-  }
 
-  @if (splitFile && pages.length > 0) {
-    <div class="flex gap-6">
+    @if (isSuccess) {
+      <div class="bg-primary/10 border border-primary/30 rounded-xl p-4 sm:p-6 flex flex-col sm:flex-row items-center justify-between gap-4 animate-fadeIn">
+        <div class="flex items-center gap-3 text-center sm:text-left flex-col sm:flex-row w-full sm:w-auto">
+          <div class="w-10 h-10 rounded-full bg-primary text-primary-on flex items-center justify-center flex-shrink-0">
+            <mat-icon fontIcon="check" class="!text-xl flex items-center justify-center"></mat-icon>
+          </div>
+          <div>
+            <p class="text-base font-bold text-on-surface">Fichier traité avec succès !</p>
+            <p class="text-sm text-on-surface-variant">Votre nouveau document PDF a été généré localement.</p>
+          </div>
+        </div>
+        <button type="button" (click)="isSuccess = false; splitFile = null; pages = []"
+                class="w-full sm:w-auto text-center px-5 py-2.5 bg-primary hover:bg-primary-container text-primary-on rounded-full text-sm font-semibold transition-colors cursor-pointer shadow-xs whitespace-nowrap">
+          Séparer un autre fichier
+        </button>
+      </div>
+    }
 
-      <!-- Panneau gauche -->
-      <div class="w-48 shrink-0 flex flex-col gap-3">
+    @if (!splitFile && !isSuccess) {
+      <div
+        (dragover)="onDragOver($event)"
+        (dragleave)="isDragOver = false"
+        (drop)="onDropSplit($event)"
+        (click)="splitInput.click()"
+        [class.bg-primary]="isDragOver"
+        [class.border-primary]="isDragOver"
+        class="bg-surface-container border border-dashed border-outline-variant rounded-xl p-6 sm:p-16 text-center cursor-pointer min-h-[220px] sm:min-h-[260px] flex flex-col justify-center items-center gap-2 transition-all hover:bg-surface-container-high">
 
-        <!-- Infos fichier -->
-        <div class="flex flex-col gap-1 px-4 py-3 bg-[#141820] border border-[#2a3040] rounded-xl">
-          <p class="text-xs text-[#e8e0d0] truncate m-0">{{ splitFile.name }}</p>
-          <p class="text-xs text-gray-500 m-0">{{ pages.length }} pages</p>
+        <div class="w-12 h-12 rounded-full bg-[#d1fae5] flex items-center justify-center text-[#0b4f36] border border-[#e2e8f0]">
+          <mat-icon fontIcon="upload_file" class="!text-xl !w-5 !h-7 flex items-center justify-center"></mat-icon>
         </div>
 
-        <!-- Sélection -->
-        <div class="flex flex-col gap-2 px-4 py-3 bg-[#141820] border border-[#2a3040] rounded-xl">
-          <p class="text-xs text-gray-500 m-0">Sélection</p>
-          <button (click)="selectAll()"
-                  class="w-full text-left text-xs text-gray-400 hover:text-amber-600
-                         bg-transparent border-none cursor-pointer p-0 transition-colors">
-            ✅ Tout sélectionner
-          </button>
-          <button (click)="deselectAll()"
-                  class="w-full text-left text-xs text-gray-400 hover:text-red-400
-                         bg-transparent border-none cursor-pointer p-0 transition-colors">
-            ❌ Tout désélectionner
-          </button>
-        </div>
+        <p class="text-base font-bold text-[#0f172a]">Déposer votre PDF ici</p>
+        <span class="text-xs text-[#475569]/60">ou</span>
 
-        <!-- Compteur -->
-        <div class="px-4 py-3 bg-[#141820] border border-[#2a3040] rounded-xl">
-          <p class="text-xs text-gray-500 m-0">Pages sélectionnées</p>
-          <p class="text-2xl font-bold text-amber-600 m-0">{{ selectedCount }}</p>
-          <p class="text-xs text-gray-500 m-0">sur {{ pages.length }}</p>
-        </div>
 
-        <!-- Nom du fichier -->
-        <input [(ngModel)]="outputName" placeholder="selection.pdf"
-               class="px-3 py-2 text-xs bg-[#0c0f14] border border-[#2a3040]
-                      rounded-lg text-[#e8e0d0] outline-none focus:border-amber-700/50
-                      placeholder-[#3a4255] font-mono w-full"/>
-
-        <!-- Bouton extraire -->
-        @if (selectedCount > 0) {
-          <button (click)="onExtract()" [disabled]="splitting"
-                  class="flex items-center justify-center gap-2 py-3 rounded-xl text-xs font-medium
-                         bg-amber-700 hover:bg-amber-600 text-[#0c0f14] transition-colors
-                         disabled:opacity-40 disabled:cursor-not-allowed">
-            <i class="ti ti-download" aria-hidden="true"></i>
-            {{ splitting ? 'Extraction...' : 'Extraire' }}
-          </button>
-        }
-
-        <!-- Changer de fichier -->
-        <button (click)="splitFile = null; pages = []"
-                class="flex items-center justify-center gap-2 py-2 rounded-xl text-xs
-                       border border-[#2a3040] hover:border-red-500/30 text-gray-500
-                       hover:text-red-400 bg-transparent cursor-pointer transition-colors">
-          <i class="ti ti-refresh" aria-hidden="true"></i>
-          Changer de fichier
+        <button type="button"
+                class="flex items-center gap-2 px-5 py-2.5 bg-[#0b4f36] hover:bg-[#15694a] text-white rounded-xl text-sm font-semibold transition-colors cursor-pointer mt-1 shadow-xs">
+          <mat-icon fontIcon="add" class="!text-sm !w-4 !h-4 flex items-center justify-center !text-white"></mat-icon>
+          Parcourir les fichiers
         </button>
 
+        <input #splitInput type="file" accept=".pdf" (change)="onSplitFileSelected($event)" class="hidden"/>
+      </div>
+    }
+
+    @if (splitFile && pages.length > 0 && !isSuccess) {
+      <div class="bg-inverse-surface text-inverse-on-surface p-4 sm:p-6 rounded-xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shadow-xs">
+        <span class="text-xs sm:text-sm font-mono tracking-wide truncate max-w-full block">{{ splitFile.name }}</span>
+        <button type="button" (click)="splitFile = null; pages = []"
+                class="w-full sm:w-auto text-center bg-transparent border border-outline-variant/30 px-3 py-1.5 rounded-md text-inverse-on-surface hover:bg-surface-container-lowest/10 transition-colors cursor-pointer text-xs font-semibold whitespace-nowrap">
+          Changer de fichier
+        </button>
       </div>
 
-      <!-- Grille de pages -->
-      <div class="flex-1 grid grid-cols-4 gap-4 content-start">
+      <div class="flex flex-col gap-2 w-full max-w-md bg-surface-container-low p-4 sm:p-5 rounded-xl border border-outline-variant/40">
+        <label class="text-xs font-bold uppercase tracking-wider text-on-surface-variant">Nom du fichier extrait :</label>
+        <div class="relative flex-1">
+          <input [(ngModel)]="outputName" type="text" placeholder="Ex: document_extrait"
+                 class="w-full pl-4 pr-14 py-2.5 sm:py-3 text-sm bg-surface-container-lowest border border-outline-variant rounded-md text-on-surface font-medium outline-none focus:border-primary focus:ring-1 focus:ring-primary">
+          <span class="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-on-surface-variant/60 pointer-events-none">.pdf</span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-6 my-4">
         @for (page of pages; track page.pageNumber) {
           <div (click)="togglePage(page)"
-               class="relative flex flex-col gap-2 cursor-pointer group">
+               class="flex flex-col items-center gap-2 cursor-pointer group select-none relative">
 
-            <!-- Miniature -->
-            <div class="relative rounded-lg overflow-hidden border-2 transition-all"
-                 [class.border-amber-500]="page.selected"
-                 [class.border-transparent]="!page.selected">
+            <div [class.border-primary]="page.selected"
+                 [class.border-transparent]="!page.selected"
+                 [class.bg-primary-container/40]="page.selected"
+            class="w-full aspect-[4/5] bg-surface-container-low border rounded-xl relative transition-all flex items-center justify-center p-2.5 sm:p-3">
 
-              <img [src]="page.dataUrl" class="w-full block"/>
+            <div class="w-full h-full bg-surface-container-lowest rounded-md shadow-xs overflow-hidden flex items-center justify-center relative">
+              <img [src]="page.dataUrl" class="w-full h-full object-contain block opacity-95" alt="Miniature page" />
 
-              <!-- Overlay sélectionné -->
-              @if (page.selected) {
-                <div class="absolute inset-0 bg-amber-500/20 flex items-center justify-center">
-                  <div class="w-7 h-7 rounded-full bg-amber-500 flex items-center justify-center">
-                    <i class="ti ti-check text-sm text-[#0c0f14]" aria-hidden="true"></i>
-                  </div>
+              <div class="absolute inset-0 bg-on-surface/5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                <div (click)="openPreview($event, page)"
+                     class="p-2 bg-surface-container-lowest rounded-full shadow-sm text-primary hover:scale-110 transition-transform cursor-pointer flex items-center justify-center">
+                  <mat-icon fontIcon="zoom_in" class="!text-lg"></mat-icon>
                 </div>
-              }
-
-              <!-- Overlay hover -->
-              @if (!page.selected) {
-                <div class="absolute inset-0 bg-white/0 group-hover:bg-white/5 transition-colors"></div>
-              }
+              </div>
             </div>
 
-            <!-- Numéro de page -->
-            <p class="text-center text-xs m-0"
-               [class.text-amber-500]="page.selected"
-               [class.text-gray-500]="!page.selected">
-              {{ page.pageNumber }}
-            </p>
+            @if (page.selected) {
+              <div class="absolute inset-0 bg-primary/5 flex items-center justify-center rounded-xl pointer-events-none">
+                <span class="bg-primary text-primary-on text-[9px] sm:text-[10px] font-headline font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Sélectionné</span>
+              </div>
+            }
+          </div>
+
+          <span class="text-xs sm:text-sm font-medium text-on-surface">Page {{ page.pageNumber }}</span>
           </div>
         }
       </div>
 
-    </div>
-  }
+      @if (selectedCount > 0) {
+        <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 sm:gap-4 mt-2 w-full">
+          <button type="button" (click)="deselectAll()" class="w-full sm:w-auto text-center px-5 py-2.5 border border-outline-variant bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container-low text-sm rounded-full font-semibold transition-colors cursor-pointer">
+            Tout désélectionner
+          </button>
+          <button type="button" (click)="onExtract()" [disabled]="splitting"
+                  class="w-full sm:w-auto text-center px-6 py-2.5 bg-primary hover:bg-primary-container text-primary-on font-headline font-semibold text-sm rounded-full shadow-xs transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed">
+            {{ splitting ? 'Extraction...' : 'Extraire la sélection (' + selectedCount + ')' }}
+          </button>
+        </div>
+      }
+    }
 
+    @if (previewPage && !isSuccess) {
+      <div (click)="closePreview()"
+           class="fixed inset-0 bg-on-surface/60 backdrop-blur-xs z-50 flex flex-col items-center justify-center p-4">
+
+        <div (click)="$event.stopPropagation()"
+             class="bg-surface-container-lowest rounded-xl p-4 sm:p-6 shadow-xl max-w-3xl w-full max-h-[90vh] sm:max-h-[85vh] flex flex-col gap-4 relative">
+
+          <div class="flex justify-between items-center border-b border-outline-variant/60 pb-3">
+            <span class="text-base sm:text-headline-sm font-bold text-on-surface">Aperçu : Page {{ previewPage.pageNumber }}</span>
+            <button type="button" (click)="closePreview()"
+                    class="bg-transparent border-none text-on-surface-variant hover:text-on-surface cursor-pointer text-xl flex items-center justify-center p-1">
+              <mat-icon fontIcon="close"></mat-icon>
+            </button>
+          </div>
+
+          <div class="flex-1 overflow-auto flex items-center justify-center bg-surface-container-low rounded-md p-2 sm:p-4 min-h-[250px]">
+            <img [src]="previewPage.dataUrl" class="max-w-full max-h-[50vh] sm:max-h-[60vh] object-contain shadow-xs rounded-sm" alt="Aperçu grand format" />
+          </div>
+
+          <div class="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 pt-3 border-t border-outline-variant/60 w-full">
+            <button type="button" (click)="togglePage(previewPage); closePreview()"
+                    class="w-full sm:w-auto px-5 py-2.5 text-sm font-semibold rounded-full border transition-colors cursor-pointer text-center"
+                    [class.bg-error]="previewPage.selected"
+            [class.text-error]="previewPage.selected"
+            [class.border-error]="previewPage.selected"
+            [class.bg-primary]="!previewPage.selected"
+            [class.text-primary-on]="!previewPage.selected"
+            [class.border-transparent]="!previewPage.selected">
+            {{ previewPage.selected ? '❌ Désélectionner la page' : '✅ Sélectionner la page' }}
+            </button>
+            <button type="button" (click)="closePreview()" class="w-full sm:w-auto px-5 py-2.5 bg-surface-container-high text-on-surface text-sm font-semibold rounded-full hover:bg-outline-variant/40 cursor-pointer border-none transition-colors text-center">
+              Fermer
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+
+  </div>
 </div>

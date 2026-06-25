@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import * as pdfjsLib from 'pdfjs-dist';
 import { PdfToolsService } from '@services/pdf-tools.service';
 import {FormsModule} from '@angular/forms';
+import {MatIcon} from '@angular/material/icon';
 pdfjsLib.GlobalWorkerOptions.workerSrc = './assets/pdf.worker.min.mjs';
 
 interface PageThumbnail {
@@ -13,7 +14,8 @@ interface PageThumbnail {
 @Component({
   selector: 'app-split-pdf',
   imports: [
-    FormsModule
+    FormsModule,
+    MatIcon
   ],
   templateUrl: './separation.component.html'
 })
@@ -23,14 +25,29 @@ export class SeparationComponent {
   splitting = false;
   pages: PageThumbnail[] = [];
   outputName = 'selection.pdf';
+  isSuccess : boolean = false;
 
   constructor(private pdfToolsService: PdfToolsService) {}
 
+  previewPage: PageThumbnail | null = null;
   async onSplitFileSelected(event: Event): Promise<void> {
     const file = (event.target as HTMLInputElement).files?.[0];
     if (!file) return;
     this.splitFile = file;
     await this.generateThumbnails(file);
+  }
+
+
+
+  // NOUVEAU : Ouvrir la vue en grand
+  openPreview(event: Event, page: PageThumbnail): void {
+    event.stopPropagation(); // Évite de déclencher le clic de sélection en même temps
+    this.previewPage = page;
+  }
+
+  // NOUVEAU : Fermer la vue en grand
+  closePreview(): void {
+    this.previewPage = null;
   }
 
   async onDropSplit(event: DragEvent): Promise<void> {
@@ -50,7 +67,7 @@ export class SeparationComponent {
 
     for (let i = 1; i <= pdf.numPages; i++) {
       const page = await pdf.getPage(i);
-      const viewport = page.getViewport({ scale: 0.4 });
+      const viewport = page.getViewport({ scale: 1.5 });
 
       const canvas = document.createElement('canvas');
       canvas.width = viewport.width;
@@ -102,11 +119,19 @@ export class SeparationComponent {
       results.map(r => new File ([r.bytes as BlobPart], r.nom, { type: 'application/pdf' }))
     );
     this.pdfToolsService.download(merged, this.outputName || 'selection.pdf');
+    this.isSuccess = true;
     this.splitting = false;
+
   }
 
   onDragOver(event: DragEvent): void {
     event.preventDefault();
     this.isDragOver = true;
+  }
+
+  getSelectedPagesList(): string {
+    const selected = this.pages.filter(p => p.selected).map(p => p.pageNumber);
+    if (selected.length === 0) return 'Aucune';
+    return 'Page ' + selected.join(', ');
   }
 }

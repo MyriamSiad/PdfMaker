@@ -30,7 +30,7 @@ import {PdfViewerComponent} from '@features/pdf-viewer/pdf-viewer.component';
        },
 
 
-       { path :'viewer/:idFichier',
+       { path :'viewer/:id',
          loadComponent : () => import ('@features/pdf-viewer/pdf-viewer.component').then(m => m.PdfViewerComponent)
        },
 

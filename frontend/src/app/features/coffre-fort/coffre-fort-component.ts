@@ -10,6 +10,7 @@ import { NgZone } from '@angular/core';
 import {Router} from '@angular/router';
 import {Observable} from 'rxjs';
 import {DossierResponseDto} from '@core/models/dossier/dossier.model';
+import {MatIcon} from '@angular/material/icon';
 
 
 export interface Fichier {
@@ -29,7 +30,7 @@ export interface DossierVirtuel {
 @Component({
   selector: 'app-vault',
   standalone: true,
-  imports: [CommonModule, FormsModule, NgxExtendedPdfViewerModule],
+  imports: [CommonModule, FormsModule, NgxExtendedPdfViewerModule, MatIcon],
   templateUrl: 'coffre-fort-component.html',
   //styleUrls: ['./vault.component.css']
 })
@@ -59,6 +60,7 @@ export class VaultComponent  {
   dossierOuvertId: number | null = null;
   selectedDossierId : number |null = null;
 
+  isSuccess : boolean = false;
   getUserId(): number {
 
     const user = JSON.parse(sessionStorage.getItem('user')!);
@@ -137,6 +139,7 @@ export class VaultComponent  {
   }
 
 
+
   onDossierClick(idDossier: number): void {
     if (this.dossierOuvertId === idDossier) {
       this.dossierOuvertId = null;
@@ -167,29 +170,56 @@ export class VaultComponent  {
 
   loadDossiers(): void {
     this.vaultService.getDossier().subscribe({
-      next: (dossiers) => this.dossiers = dossiers,
-      error: (err) => console.error(err)
+      next: (dossiers) => {
+        this.dossiers = dossiers;
+
+        if (this.dossiers && this.dossiers.length > 0) {
+          this.selectedDossierId = this.dossiers[0].idDossier;
+        }
+      },
+      error: (err) => {
+        console.error('Erreur lors du chargement des dossiers :', err);
+      }
     });
   }
 
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private readonly ngZone: NgZone) {
+
+  }
   onClickDecryptFile(fichier: Fichier): void {
-    /*this.loadingDecrypt = false;
+    // 1. On active le spinner de chargement au début de l'action
+    this.loadingDecrypt = true;
+    this.error = null; // On réinitialise les anciennes erreurs potentielles
+
     this.vaultService.decryptFile(fichier.idFichier).subscribe({
       next: async (blob) => {
-        const buffer = await blob.arrayBuffer();
-            this.ngZone.run(() => {
-              this.resultat = new Uint8Array(buffer);
-              this.loadingDecrypt = false;
+        try {
+          const buffer = await blob.arrayBuffer();
+
+          this.ngZone.run(() => {
+            this.resultat = new Uint8Array(buffer);
+            this.loadingDecrypt = false; // Désactive le spinner après le traitement réussi
+
+
+            this.router.navigate(['/viewer', fichier.idFichier]);
+          });
+        } catch (err) {
+          this.ngZone.run(() => {
+            console.error('Erreur conversion buffer', err);
+            this.error = 'Erreur lors du traitement du fichier décrypté.';
+            this.loadingDecrypt = false;
+          });
+        }
+      }, // <-- La virgule de séparation qui manquait ici
+      error: (err) => {
+        this.ngZone.run(() => {
+          console.error('Erreur décryptage', err);
+          this.error = 'Erreur lors du décryptage du fichier.';
+          this.loadingDecrypt = false; // Désactive le spinner même s'il y a un échec réseau
         });
-      },*/
-    this.router.navigate(['/viewer', fichier.idFichier]);
-      /*error: (err) => {
-        console.error('Erreur décryptage', err);
-        this.error = 'Erreur lors du décryptage du fichier.';
       }
-    });*/
+    });
   }
 
     onOpenVault(): void {
@@ -200,6 +230,7 @@ export class VaultComponent  {
         this.vaultService.unlock();
         this.loadingVault = true;
         this.loadDossiers();
+        this.ngOnInit();
       },
       error: (err) => {
         this.error = "Mot de passe incorrect ou erreur technique.";
@@ -213,12 +244,20 @@ export class VaultComponent  {
   onEncrypt(): void {
     if (!this.selectedFile || !this.selectedDossierId) return;
 
-
     this.vaultService.encryptFile( this.selectedFile , this.selectedDossierId ).subscribe({
-      next: (blob) => this.downloadFile(blob, 'encrypted.bin'),
+      next: (blob) => {
+
+        this.isSuccess = true;
+        console.log('Chiffrement réussi, isSuccess vaut :', this.isSuccess);
+
+        this.selectedFile = null;
+      },
       error: (err) => {
+        this.isSuccess = false;
         if (err.status === 401) {
-          this.vaultOpen = false; // session expirée → on re-demande le MP
+          this.vaultService.lock();
+        } else {
+          this.error = "Une erreur est survenue lors du chiffrement.";
         }
       }
     });
@@ -266,14 +305,7 @@ export class VaultComponent  {
     this.resultat = null;
     this.error = null;
   }
-  private downloadFile(blob: Blob, filename: string): void {
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    a.click();
-    URL.revokeObjectURL(url);
-  }
+
 
   onLock() {
     this.vaultService.lock();

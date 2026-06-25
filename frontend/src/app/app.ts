@@ -3,12 +3,13 @@ import { RouterOutlet } from '@angular/router';
 
 import {AuthService} from '@services/auth.service';
 import {Navbar} from '@shared/components/navbar/navbar';
+import {FooterComponent} from '@shared/components/footer/footer';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Navbar],
+  imports: [RouterOutlet, Navbar, FooterComponent],
   templateUrl: './app.html',
-  styleUrl: './app.css'
+  //styleUrl: './app.css'
 })
 export class App {
 

@@ -1,0 +1,20 @@
+/* Style de l'onglet actif s'alignant sur l'élément Vault du screen */
+.active-link {
+  background-color: #23583F !important;
+  color: #4ADE80 !important;
+  box-shadow: 0 4px 12px rgba(35, 88, 63, 0.15);
+}
+
+/* Force les icônes SVG internes à prendre la couleur de l'élément actif */
+.active-link svg {
+  color: #4ADE80 !important;
+}
+
+/* Scrollbar épurée pour la navigation interne */
+nav::-webkit-scrollbar {
+  width: 4px;
+}
+nav::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.05);
+  border-radius: 99px;
+}

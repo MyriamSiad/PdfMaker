@@ -4,17 +4,26 @@ import {NgClass} from '@angular/common';
 import {PdfToolsService} from '@services/pdf-tools.service';
 import {FormsModule, NgModel} from '@angular/forms';
 import {NgxExtendedPdfViewerModule} from 'ngx-extended-pdf-viewer';
+import {MatIcon} from '@angular/material/icon';
+import {CdkDrag, CdkDragDrop, CdkDropList, moveItemInArray} from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-fusion',
   imports: [
     FormsModule,
-    NgxExtendedPdfViewerModule
+    NgxExtendedPdfViewerModule,
+    NgClass,
+    MatIcon,
+    CdkDropList,
+    CdkDrag
 
   ],
-  templateUrl: './fusion.component.html'
+  templateUrl: './fusion.component.html',
+  styleUrl:'./fusion.component.css'
 })
 export class FusionComponent {
+
+  isSuccess : boolean = false ;
   pdfToolsService : PdfToolsService = new PdfToolsService();
 selectedFiles: File[] = [];
   previewIndex: number | null = null;
@@ -37,7 +46,10 @@ selectedFiles: File[] = [];
     event.preventDefault();
     this.isDragOver = true;
   }
-
+  dropCard(event: CdkDragDrop<File[]>): void {
+    moveItemInArray(this.mergeFiles, event.previousIndex, event.currentIndex);
+    this.previewIndex = null; // Optionnel : ferme l'aperçu pour éviter les décalages visuels
+  }
   onDrop(event: DragEvent): void {
     event.preventDefault();
     this.isDragOver = false;
@@ -64,6 +76,8 @@ selectedFiles: File[] = [];
     const bytes = await this.pdfToolsService.mergePdfs(this.mergeFiles);
     this.pdfToolsService.download(bytes, this.mergeOutputName || 'fusion.pdf');
     this.merging = false;
+    this.isSuccess  = true ;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
 }

@@ -1,9 +1,18 @@
-@if (isLoggedIn()) {
-  <app-navbar (collapsedChange)="onNavbarToggle($event)" />
-}
+<div class="flex min-h-screen bg-surface">
 
-<div class="transition-all duration-150"
-     [class.ml-64]="isLoggedIn() && !collapsed"
-     [class.ml-21]="isLoggedIn() && collapsed">
-  <router-outlet />
+  @if (isLoggedIn()) {
+    <app-navbar (collapsedChange)="onNavbarToggle($event)" />
+  }
+
+  <div class="transition-all duration-150 flex-1 min-w-0 flex flex-col justify-between"
+       [class.md:ml-64]="isLoggedIn() && !collapsed"
+       [class.md:ml-21]="isLoggedIn() && collapsed">
+
+    <main class="flex-1">
+      <router-outlet />
+    </main>
+
+    <app-footer />
+  </div>
+
 </div>

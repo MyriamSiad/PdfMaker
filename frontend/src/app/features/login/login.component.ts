@@ -15,7 +15,8 @@ import {NgClass} from '@angular/common';
     FormsModule,
     MatIcon
   ],
-  templateUrl: './login.component.html'
+  templateUrl: './login.component.html',
+  styleUrl : './login.component.css'
 })
 export class LoginComponent {
 

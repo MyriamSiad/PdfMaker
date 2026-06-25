@@ -15,7 +15,8 @@ import {NgClass} from '@angular/common';
     MatIcon,
     NgClass
   ],
-  templateUrl: './register.component.html'
+  templateUrl: './register.component.html',
+  styleUrl: './register.component.css'
 })
 export class RegisterComponent {
 
