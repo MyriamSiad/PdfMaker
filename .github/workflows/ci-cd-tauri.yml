@@ -54,6 +54,7 @@ jobs:
 
       - name: Copy JAR to Tauri resources
         run: |
+          chmod +r backend/target/pdf-maker.jar
           mkdir -p frontend/src-tauri/resources
           cp backend/target/pdf-maker.jar frontend/src-tauri/resources/pdf-maker.jar
           backend/target/pdf-maker.jar src-tauri/resources/
