@@ -8,6 +8,7 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "dev": "tauri dev",
+    "tauri": "tauri",
     "fresh": "rm node_modules package-lock.json && npm install && npm run dev"
   },
   "prettier": {

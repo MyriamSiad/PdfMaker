@@ -69,6 +69,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           projectPath: frontend
+          tauriScript: npx tauri
           tagName: v__VERSION__
           releaseName: 'PdfMaker v__VERSION__'
           releaseDraft: true
