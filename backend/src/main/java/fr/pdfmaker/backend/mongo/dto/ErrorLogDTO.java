@@ -11,12 +11,10 @@ import java.time.LocalDateTime;
 
 //Pour respecter la convention de l'API REST, on utilise un DTO pour exposer les données de LoginHistorique
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor
-public class LoginHistoriqueCreateResponseDto {
-    private String id;
-    private Long userId;
-    private String firstname;
-    private String lastname;
-    private String email;
-    private LocalDateTime loginDate;
-    private String status; //SUCCESS, FAILURE
+public class ErrorLogDTO {
+    private String exceptionClass;
+    private String message;
+    private String stackTrace;
+    private String uri;
+    private String origin;
 }

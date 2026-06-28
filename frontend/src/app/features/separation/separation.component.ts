@@ -3,6 +3,7 @@ import * as pdfjsLib from 'pdfjs-dist';
 import { PdfToolsService } from '@services/pdf-tools.service';
 import {FormsModule} from '@angular/forms';
 import {MatIcon} from '@angular/material/icon';
+import {logFrontendError} from '@services/error-logger.service';
 pdfjsLib.GlobalWorkerOptions.workerSrc = './assets/pdf.worker.min.mjs';
 
 interface PageThumbnail {
@@ -30,6 +31,9 @@ export class SeparationComponent {
   pages: PageThumbnail[] = [];
   outputName = 'selection.pdf';
   isSuccess : boolean = false;
+  errorMessage: string | null = null;
+
+
 
   constructor(private pdfToolsService: PdfToolsService) {}
 
@@ -37,9 +41,20 @@ export class SeparationComponent {
   async onSplitFileSelected(event: Event): Promise<void> {
     const file = (event.target as HTMLInputElement).files?.[0];
     if (!file) return;
+
+    if (file.type !== 'application/pdf') {
+      const error = new Error(`Format invalide : "${file.type || 'inconnu'}" n'est pas un PDF`);
+      error.name = 'InvalidFileTypeError';
+      await logFrontendError(error, '/pdf/split/file-select');
+      this.isSuccess = false;
+      this.errorMessage = 'Le fichier sélectionné n\'est pas un PDF.';
+      return;
+    }
+
     this.splitFile = file;
     await this.generateThumbnails(file);
   }
+
 
 
 
@@ -58,10 +73,19 @@ export class SeparationComponent {
     event.preventDefault();
     this.isDragOver = false;
     const file = event.dataTransfer?.files?.[0];
-    if (file?.type === 'application/pdf') {
-      this.splitFile = file;
-      await this.generateThumbnails(file);
+    if (!file) return;
+
+    if (file.type !== 'application/pdf') {
+      const error = new Error(`Format invalide : "${file.type || 'inconnu'}" n'est pas un PDF`);
+      error.name = 'InvalidFileTypeError';
+      await logFrontendError(error, '/pdf/split/drag-and-drop');
+      this.isSuccess = false;
+      this.errorMessage = 'Seuls les fichiers PDF sont acceptés.';
+      return;
     }
+
+    this.splitFile = file;
+    await this.generateThumbnails(file);
   }
 
   async generateThumbnails(file: File): Promise<void> {
@@ -111,23 +135,28 @@ export class SeparationComponent {
     if (!this.splitFile) return;
     this.splitting = true;
 
-    const selectedPages = this.pages
-      .filter(p => p.selected)
-      .map(p => ({ start: p.pageNumber, end: p.pageNumber, nom: '' }));
+    try {
+      const selectedPages = this.pages
+        .filter(p => p.selected)
+        .map(p => ({ start: p.pageNumber, end: p.pageNumber, nom: '' }));
 
-    const results = await this.pdfToolsService.splitPdf(this.splitFile, selectedPages);
+      const results = await this.pdfToolsService.splitPdf(this.splitFile, selectedPages);
 
+      const merged = await this.pdfToolsService.mergePdfs(
+        results.map(r => new File([r.bytes as BlobPart], r.nom, { type: 'application/pdf' }))
+      );
 
-    const merged = await this.pdfToolsService.mergePdfs(
+      this.pdfToolsService.download(merged, this.outputName || 'selection.pdf');
+      this.isSuccess = true;
 
-      results.map(r => new File ([r.bytes as BlobPart], r.nom, { type: 'application/pdf' }))
-    );
-    this.pdfToolsService.download(merged, this.outputName || 'selection.pdf');
-    this.isSuccess = true;
-    this.splitting = false;
-
+    } catch (error) {
+      await logFrontendError(error as Error, '/pdf/extract');
+      this.isSuccess = false;
+      // afficher un message d'erreur à l'utilisateur si besoin
+    } finally {
+      this.splitting = false;
+    }
   }
-
   onDragOver(event: DragEvent): void {
     event.preventDefault();
     this.isDragOver = true;

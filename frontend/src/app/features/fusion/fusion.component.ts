@@ -6,13 +6,13 @@ import {FormsModule, NgModel} from '@angular/forms';
 import {NgxExtendedPdfViewerModule} from 'ngx-extended-pdf-viewer';
 import {MatIcon} from '@angular/material/icon';
 import {CdkDrag, CdkDragDrop, CdkDropList, moveItemInArray} from '@angular/cdk/drag-drop';
+import {logFrontendError} from '@services/error-logger.service';
 
 @Component({
   selector: 'app-fusion',
   imports: [
     FormsModule,
     NgxExtendedPdfViewerModule,
-    NgClass,
     MatIcon,
     CdkDropList,
     CdkDrag
@@ -73,11 +73,20 @@ selectedFiles: File[] = [];
 
   async onMerge(): Promise<void> {
     this.merging = true;
-    const bytes = await this.pdfToolsService.mergePdfs(this.mergeFiles);
-    this.pdfToolsService.download(bytes, this.mergeOutputName || 'fusion.pdf');
-    this.merging = false;
-    this.isSuccess  = true ;
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    try {
+      const bytes = await this.pdfToolsService.mergePdfs(this.mergeFiles);
+      this.pdfToolsService.download(bytes, this.mergeOutputName || 'fusion.pdf');
+      this.isSuccess = true;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    } catch (error) {
+      await logFrontendError(error as Error, '/pdf/merge');
+      this.isSuccess = false;
+      // afficher un message d'erreur à l'utilisateur si besoin
+    } finally {
+      this.merging = false;
+    }
   }
 
 }
