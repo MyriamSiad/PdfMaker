@@ -7,21 +7,24 @@
     "frontendDist": "../dist/frontend/browser",
     "devUrl": "http://localhost:4200",
     "beforeDevCommand": "ng serve",
-    "beforeBuildCommand": "ng build "
+    "beforeBuildCommand": "ng build  --configuration production"
   },
   "app": {
     "windows": [
       {
         "title": "PdfMaker",
         "width": 1200,
-        "height": 600,
+        "height": 800,
+        "minWidth": 800,
+        "minHeight": 600,
         "resizable": true,
-        "fullscreen": false
+        "fullscreen": false,
+        "center": true
       }
     ],
 
     "security": {
-      "csp": null
+      "csp": "default-src 'self'; connect-src 'self' http://localhost:8080 https://api.pdfmaker.fr; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:"
     }
   },
   "bundle": {
@@ -33,7 +36,14 @@
       "icons/128x128@2x.png",
       "icons/icon.icns",
       "icons/icon.ico"
-    ]
+    ],
+    "resources": [
+      "resources/pdf-maker.jar"
+    ],
+    "copyright": "Myriam SIAD",
+    "category": "Utility",
+    "shortDescription": "Outil de gestion de PDF",
+    "longDescription": "Application de fusion, séparation et gestion de fichiers PDF"
   },
   "plugins": {
     "fs": {

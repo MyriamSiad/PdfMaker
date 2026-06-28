@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:7
+    container_name: pdf_maker_mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    environment:
+      MONGO_INITDB_DATABASE: pdf_maker_mongo
+
+  mysql:
+    image: mysql:8
+    container_name: pdf_maker_mysql
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: db_pdfmaker
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  backend:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.backend
+    container_name: pdf_maker_backend
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mongodb
+      - mysql
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/pdf_maker_mongo
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/db_pdfmaker?createDatabaseIfNotExist=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+    volumes:
+      - ./logs:/app/logs
+
+volumes:
+  mongo_data:
+  mysql_data:

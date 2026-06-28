@@ -1,0 +1,67 @@
+# .github/workflows/ci-cd-tauri.yml
+name: CI/CD Tauri Desktop
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build-tauri:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: linux
+          - os: windows-latest
+            target: windows
+          - os: macos-latest
+            target: macos
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install Linux dependencies
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            libappindicator3-dev \
+            librsvg2-dev \
+            patchelf
+
+      # ← Build du JAR avant Tauri
+      - name: Build Spring Boot JAR
+        run: mvn clean package -DskipTests
+        working-directory: ./backend  # adapte selon ton dossier
+
+      # ← Copier le JAR dans les resources Tauri
+      - name: Copy JAR to Tauri resources
+        run: cp backend/target/pdf-maker.jar src-tauri/resources/
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Build Tauri app
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: v__VERSION__
+          releaseName: 'PdfMaker v__VERSION__'
+          releaseDraft: true

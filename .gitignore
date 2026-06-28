@@ -12,7 +12,12 @@ build/
 .vscode/
 .idea/
 *.swp
+src-tauri/resources/pdf-maker.jar
 
+target/
+src-tauri/target/
+
+logs/
 # OS
 .DS_Store
 Thumbs.db
