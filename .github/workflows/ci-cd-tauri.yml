@@ -50,7 +50,7 @@ jobs:
 
       - name: Build Spring Boot JAR
         run: mvn clean package -DskipTests
-        working-directory: ./backend  # adapte selon ton dossier
+
 
       - name: Copy JAR to Tauri resources
         run: |
