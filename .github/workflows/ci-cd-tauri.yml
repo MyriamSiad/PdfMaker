@@ -47,14 +47,16 @@ jobs:
             librsvg2-dev \
             patchelf
 
-      # ← Build du JAR avant Tauri
+
       - name: Build Spring Boot JAR
         run: mvn clean package -DskipTests
         working-directory: ./backend  # adapte selon ton dossier
 
-      # ← Copier le JAR dans les resources Tauri
       - name: Copy JAR to Tauri resources
-        run: cp backend/target/pdf-maker.jar src-tauri/resources/
+        run: |
+          mkdir -p frontend/src-tauri/resources
+          cp backend/target/pdf-maker.jar frontend/src-tauri/resources/pdf-maker.jar
+          backend/target/pdf-maker.jar src-tauri/resources/
 
       - name: Install frontend dependencies
         run: npm ci
