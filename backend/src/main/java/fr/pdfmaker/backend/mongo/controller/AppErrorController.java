@@ -1,19 +1,30 @@
 package fr.pdfmaker.backend.mongo.controller;
 
 
-import fr.pdfmaker.backend.mongo.service.LoginHistoriqueService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import fr.pdfmaker.backend.mongo.dto.ErrorLogDTO;
+import fr.pdfmaker.backend.mongo.service.AppErrorService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:8080")
-@RequestMapping("/api/loginHistorique")
-public class LoginHistoriqueController {
+@CrossOrigin (origins =  "http://localhost:4200")
+@RequestMapping("/api/errors")
+public class AppErrorController {
 
-    @Autowired
-    private  LoginHistoriqueService loginHistoriqueService;
+
+    private final AppErrorService errorLogService;
+
+    public AppErrorController (AppErrorService errorLogService) {
+        this.errorLogService = errorLogService;
+    }
+
+    // Seul endpoint nécessaire : écriture depuis le frontend
+    @PostMapping
+    public ResponseEntity<Void> logError(@RequestBody ErrorLogDTO dto) {
+        errorLogService.logFromDto(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
 
 
 

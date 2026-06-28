@@ -1,14 +1,19 @@
 package fr.pdfmaker.backend.exception;
 
+import fr.pdfmaker.backend.mongo.service.AppErrorService;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Gestionnaire centralisé des exceptions.
@@ -18,10 +23,16 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalHandlerException {
 
+    @Autowired
+    private AppErrorService appErrorService;
+
+    @Autowired
+    private HttpServletRequest request;
 
     @ExceptionHandler(FichierIntrouvableException.class)
     public ResponseEntity<Map<String, Object>> handleFichierIntrouvable(
             FichierIntrouvableException ex) {
+        logBackendError(ex);
         return buildResponse(HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
@@ -29,6 +40,7 @@ public class GlobalHandlerException {
     @ExceptionHandler(UnsupportedFormatException.class)
     public ResponseEntity<Map<String, Object>> handleUnsupportedFormat(
             UnsupportedFormatException ex) {
+        logBackendError(ex);
         return buildResponse(HttpStatus.UNSUPPORTED_MEDIA_TYPE, ex.getMessage());
     }
 
@@ -36,6 +48,7 @@ public class GlobalHandlerException {
     @ExceptionHandler(ConversionException.class)
     public ResponseEntity<Map<String, Object>> handleConversion(
             ConversionException ex) {
+        logBackendError(ex);
         return buildResponse(HttpStatus.UNPROCESSABLE_ENTITY, ex.getMessage());
     }
 
@@ -43,6 +56,7 @@ public class GlobalHandlerException {
     @ExceptionHandler(PdfManipulationException.class)
     public ResponseEntity<Map<String, Object>> handlePdfManipulation(
             PdfManipulationException ex) {
+        logBackendError(ex);
         return buildResponse(HttpStatus.UNPROCESSABLE_ENTITY, ex.getMessage());
     }
 
@@ -70,7 +84,23 @@ public class GlobalHandlerException {
     public ResponseEntity<Map<String, String>> gererEmailDejaUtilise(EmailDejaUtiliserException e) {
         Map<String, String> erreur = new HashMap<>();
         erreur.put("message", e.getMessage());
+
+
         return ResponseEntity.status(409).body(erreur); // 409 = Conflict
+    }
+
+    private void logBackendError(Exception ex) {
+        String stackTrace = Arrays.stream(ex.getStackTrace())
+                .map(StackTraceElement::toString)
+                .collect(Collectors.joining("\n"));
+
+       appErrorService.logError(
+                ex.getClass().getName(),
+                ex.getMessage(),
+                stackTrace,
+                request.getRequestURI(),
+                "BACKEND"
+        );
     }
 
     @ExceptionHandler (LoginIncorrectException.class)

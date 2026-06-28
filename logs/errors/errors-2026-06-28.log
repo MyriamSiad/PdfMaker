@@ -1,0 +1,17 @@
+============================================================
+[2026-06-28 11:58:23] FRONTEND | 6a40f03f08767f53b491d691
+URI       : /pdf/split/file-select
+EXCEPTION : InvalidFileTypeError
+MESSAGE   : Format invalide : "image/png" n'est pas un PDF
+STACKTRACE:
+InvalidFileTypeError: Format invalide : "image/png" n'est pas un PDF
+    at _SeparationComponent.<anonymous> (http://localhost:4200/chunk-6KAZ5BT5.js:302:23)
+    at Generator.next (<anonymous>)
+    at http://localhost:4200/chunk-R7WCV5R6.js:23:61
+    at new ZoneAwarePromise (http://localhost:4200/@fs/C:/Users/siadm/Desktop/Formation%20CDA%202025/pdfmaker/frontend/.angular/cache/20.3.22/frontend/vite/deps/zone__js.js?v=afa39034:2171:23)
+    at __async (http://localhost:4200/chunk-R7WCV5R6.js:7:10)
+    at _SeparationComponent.onSplitFileSelected (http://localhost:4200/chunk-6KAZ5BT5.js:297:12)
+    at SeparationComponent_Conditional_11_Template_input_change_10_listener (http://localhost:4200/chunk-6KAZ5BT5.js:93:46)
+    at executeListenerWithErrorHandling (http://localhost:4200/@fs/C:/Users/siadm/Desktop/Formation%20CDA%202025/pdfmaker/frontend/.angular/cache/20.3.22/frontend/vite/deps/chunk-IQYJVS5N.js?v=afa39034:12044:12)
+    at wrapListenerIn_markDirtyAndPreventDefault (http://localhost:4200/@fs/C:/Users/siadm/Desktop/Formation%20CDA%202025/pdfmaker/frontend/.angular/cache/20.3.22/frontend/vite/deps/chunk-IQYJVS5N.js?v=afa39034:12031:18)
+    at HTMLInputElement.<anonymous> (http://localhost:4200/@fs/C:/Users/siadm/Desktop/Formation%20CDA%202025/pdfmaker/frontend/.angular/cache/20.3.22/frontend/vite/deps/chunk-WAT7UZZK.js?v=afa39034:696:96)

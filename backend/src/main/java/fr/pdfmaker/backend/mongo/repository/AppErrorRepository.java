@@ -1,10 +1,14 @@
 package fr.pdfmaker.backend.mongo.repository;
 
-import fr.pdfmaker.backend.mongo.document.LoginHistorique;
+import fr.pdfmaker.backend.mongo.document.AppError;
+
 import fr.pdfmaker.backend.repository.IUtilisateurRepository;
 import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.stereotype.Repository;
 
-public interface AppErrorRepository extends MongoRepository <LoginHistorique, String> {
+
+@Repository
+public interface AppErrorRepository extends MongoRepository <AppError, String> {
 
 
 }

@@ -1,6 +1,5 @@
 package fr.pdfmaker.backend.enums;
 
-import fr.pdfmaker.backend.mongo.document.LoginHistorique;
 import lombok.Getter;
 import lombok.extern.java.Log;
 

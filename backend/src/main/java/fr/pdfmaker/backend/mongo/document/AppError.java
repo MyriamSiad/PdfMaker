@@ -13,7 +13,6 @@ import java.time.LocalDateTime;
 
 @Getter  @Setter  @ToString
 @AllArgsConstructor
-@NoArgsConstructor
 @Document(collection = "AppError")
 public class AppError {
 
@@ -25,5 +24,16 @@ public class AppError {
     private String message;
     private String stackTrace;
     private String uri;
-    private String origin;
+    private String origin;//Frontend ou Backend
+
+    public AppError( String exceptionClass, String message, String stackTrace, String uri, String origin) {
+        this.timestamp =  LocalDateTime.now();
+        this.exceptionClass = exceptionClass;
+        this.message = message;
+        this.stackTrace = stackTrace;
+        this.uri = uri;
+        this.origin = origin;
+
+    }
+
 }

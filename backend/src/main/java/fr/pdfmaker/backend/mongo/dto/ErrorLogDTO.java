@@ -10,7 +10,9 @@ import org.springframework.data.mongodb.core.mapping.Field;
 import java.time.LocalDateTime;
 
 //Pour respecter la convention de l'API REST, on utilise un DTO pour exposer les données de LoginHistorique
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor
+@Getter
+@Setter
+@NoArgsConstructor @AllArgsConstructor
 public class ErrorLogDTO {
     private String exceptionClass;
     private String message;

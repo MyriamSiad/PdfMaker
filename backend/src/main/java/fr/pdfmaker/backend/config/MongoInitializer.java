@@ -19,13 +19,13 @@ public class MongoInitializer {
     public void init() {
         // Initialisation de la base de données MongoDB
         // Par exemple, vous pouvez créer des collections ou insérer des documents de test ici
-        if (!mongoTemplate.collectionExists("loginHistorique")) {
-            mongoTemplate.createCollection("loginHistorique");
+        if (!mongoTemplate.collectionExists("AppError")) {
+            mongoTemplate.createCollection("AppError");
         }
     }
 
     private void createLoginHistoriqueCollection(Class<?> documentClass) {
-        if (!mongoTemplate.collectionExists("loginHistorique")) {
+        if (!mongoTemplate.collectionExists("AppError")) {
             mongoTemplate.createCollection(documentClass);
         }
     }
