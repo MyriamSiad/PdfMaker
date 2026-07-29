@@ -30,8 +30,7 @@ public class GlobalHandlerException {
     private HttpServletRequest request;
 
     @ExceptionHandler(FichierIntrouvableException.class)
-    public ResponseEntity<Map<String, Object>> handleFichierIntrouvable(
-            FichierIntrouvableException ex) {
+    public ResponseEntity<Map<String, Object>> handleFichierIntrouvable(FichierIntrouvableException ex) {
         logBackendError(ex);
         return buildResponse(HttpStatus.NOT_FOUND, ex.getMessage());
     }

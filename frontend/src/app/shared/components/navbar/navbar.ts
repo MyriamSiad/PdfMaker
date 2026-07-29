@@ -10,7 +10,7 @@ import {JwtPayload} from 'jwt-decode';
   imports: [
     RouterLink,
     RouterLinkActive,
-    MatIcon
+
   ],
   templateUrl: './navbar.html',
   styleUrl: './navbar.css',

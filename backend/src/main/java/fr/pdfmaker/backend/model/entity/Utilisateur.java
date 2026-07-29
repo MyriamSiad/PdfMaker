@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Entity
@@ -48,6 +49,9 @@ public class Utilisateur implements UserDetails  {
 
     @Column(name = "salt", length = 255, nullable = false)
     private String salt;
+
+    private int failedAttempts = 0;
+    private LocalDateTime lockedUntil;
 
    /* @JsonIgnore
     @OneToMany(fetch = FetchType.LAZY , mappedBy = "utilisateur", cascade = CascadeType.ALL, orphanRemoval = true)

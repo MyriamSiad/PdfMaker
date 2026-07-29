@@ -60,7 +60,11 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
 
-        config.setAllowedOriginPatterns(List.of("*"));  // toutes les origines
+        config.setAllowedOrigins(List.of(
+                "http://localhost:4200",
+                "http://tauri.localhost",    // Permet de faire tourner le .exe final (Windows / Linux)
+                "tauri://localhost"          // Permet de faire tourner le .app final (macOS)
+        ));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(false);

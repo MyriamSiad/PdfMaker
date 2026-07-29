@@ -7,6 +7,7 @@ import fr.pdfmaker.backend.model.dto.utilisateur.LoginDto;
 import fr.pdfmaker.backend.model.dto.utilisateur.UtilisateurDto;
 import fr.pdfmaker.backend.model.entity.Utilisateur;
 import fr.pdfmaker.backend.repository.IUtilisateurRepository;
+import fr.pdfmaker.backend.security.BruteForceProtectionService;
 import fr.pdfmaker.backend.service.coffrefort.EncryptService;
 import fr.pdfmaker.backend.service.dossier.DossierStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,8 @@ import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.security.auth.login.AccountLockedException;
 
 import static fr.pdfmaker.backend.utils.DtoUserConverter.*;
 
@@ -34,6 +37,9 @@ public class UtilisateurService implements IUtilisateurService {
     @Autowired
     private DossierStorageService dossierStorageService;
 
+    @Autowired
+    private BruteForceProtectionService bruteForce;
+
     @Override
     public UtilisateurDto getUtilsateur(long id) throws Exception {
 
@@ -51,7 +57,10 @@ public class UtilisateurService implements IUtilisateurService {
     private void verifyUserInfo(InscriptionRequestDto user){
 
         if (user == null ||
-         user.getNom() == null || user.getEmail()  == null ||user.getPrenom() == null || user.getPasswordHash() == null){
+                user.getNom() == null ||
+                user.getEmail()  == null ||
+                user.getPrenom() == null ||
+                user.getPasswordHash() == null) {
          throw new IllegalArgumentException("Les données fournis sont invalide");
         }
     }
@@ -158,19 +167,31 @@ public class UtilisateurService implements IUtilisateurService {
     @Override
     public UtilisateurDto loginUser(LoginDto login) throws Exception {
             if( login.getEmail() == null || login.getMotsDePasse() == null){
+
                 throw new IllegalArgumentException("Les données de connexion sont invalides ! ");
+
             }
-        Utilisateur user = utilisateurRepository.getUtilisateurByEmail(login.getEmail().trim());
+
+            Utilisateur user = utilisateurRepository.getUtilisateurByEmail(login.getEmail().trim());
             if(user == null){
                 throw new LoginIncorrectException("Login ou mot de passe incorrect. Veuillez réessayer.");
             }
+            if (bruteForce.isLocked(user.getLockedUntil())) {
+                throw new AccountLockedException("Compte verrouillé temporairement");
+            }
             if(!verifyPassword(login.getMotsDePasse(), user.getPasswordHash())){
+                user.setFailedAttempts(user.getFailedAttempts() + 1);
+                if(bruteForce.locking(user.getFailedAttempts())){
+                    user.setLockedUntil(bruteForce.lockUntil(user.getFailedAttempts()));
+                }
+                utilisateurRepository.save(user);
                 throw new LoginIncorrectException("Mots de passe incorrect ! ");
             }
 
 
-
-        //byte[] secretKey = encryptService.secretKeyGenerator(login.getMotsDePasse(), user.getSalt());
+        user.setFailedAttempts(0);
+        user.setLockedUntil(null);
+        utilisateurRepository.save(user);
         return convertUserToUserDto(user);
     }
 }

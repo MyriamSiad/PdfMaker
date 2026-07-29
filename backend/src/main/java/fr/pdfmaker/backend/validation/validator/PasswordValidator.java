@@ -24,8 +24,3 @@ public class PasswordValidator implements ConstraintValidator<ValidPassword, Str
 
 }
 
-//Email regex:
-//^[A-Za-z0-9._%+-]+@(?:[A-Za-z0-9-]+\.)+[A-Za-z]{2,}$
-
-//Name regex:
-//^[A-Za-zÀ-ÖØ-öø-ÿ]+(?:[ '-][A-Za-zÀ-ÖØ-öø-ÿ]+)+$

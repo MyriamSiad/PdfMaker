@@ -18,7 +18,6 @@ public class PasswordConfig {
 
     @Bean
     public IPasswordService passwordService() {
-        // Choisissez l'implémentation de IPasswordService que vous souhaitez utiliser (BCrypt ou Argon2)
        // this.passwordService = new BCryptPasswordService(12); // Utilisez une implémentation de BCryptPasswordService
        return  new Argon2PasswordService(); // Utilisez une implémentation d'Argon2PasswordService
     }

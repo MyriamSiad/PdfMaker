@@ -20,7 +20,9 @@ public class Argon2PasswordService implements IPasswordService{
 
     public Argon2PasswordService() {
         // Initialisation de la configuration d'Argon2 si nécessaire
-        this.encoder = new Argon2PasswordEncoder( 16 , 32 , 1 , 65536 , 3); // Utilisez une implémentation d'Argon2PasswordEncoder
+        this.encoder = new Argon2PasswordEncoder
+                ( 16 , 32 , 1 , 65536 , 3);
+        // Utilisez une implémentation d'Argon2PasswordEncoder
     }
 
     /**

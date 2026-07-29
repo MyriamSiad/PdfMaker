@@ -85,7 +85,6 @@ public class EncryptService {
             System.arraycopy(encryptedMasterKey, 0, ivPlusCipher, iv.length, encryptedMasterKey.length);
 
 
-
             return getEncoder().encodeToString(ivPlusCipher);
         } catch (NoSuchAlgorithmException  e) {
             throw new RuntimeException("Erreur lors du chiffrage de la master key : " + e.getMessage());

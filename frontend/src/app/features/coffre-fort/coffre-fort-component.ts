@@ -107,6 +107,7 @@ export class VaultComponent  {
           idDossier: dto.idDossier,
           nomDuDossier: dto.nomDossier
         });
+        this.ngOnInit();
       },
       error: (err) => console.error('Erreur ajout dossier', err)
     });
@@ -249,6 +250,7 @@ export class VaultComponent  {
 
         this.isSuccess = true;
         console.log('Chiffrement réussi, isSuccess vaut :', this.isSuccess);
+        this.loadDossiers();
 
         this.selectedFile = null;
       },
